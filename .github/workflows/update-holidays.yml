@@ -1,0 +1,35 @@
+# 每月 1 號檢查人事行政總處是否公布新的辦公日曆表，有變更就更新 holidays.json
+name: Update holiday data
+
+on:
+  schedule:
+    - cron: "17 2 1 * *"   # 每月 1 號（UTC 02:17，台灣時間上午 10:17）
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Update holidays.json
+        run: node scripts/update-holidays.mjs
+      # 透過 GitHub API 更新檔案：commit 由 GitHub 代為建立並簽章（顯示 Verified），作者是 github-actions[bot]
+      - name: Commit changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet -- holidays.json && [ -z "$(git ls-files --others --exclude-standard holidays.json)" ]; then
+            echo "No changes"; exit 0
+          fi
+          args=(-X PUT "repos/$GITHUB_REPOSITORY/contents/holidays.json"
+            -f message="chore: update holiday data"
+            -f content="$(base64 -w0 holidays.json)"
+            -f branch="$GITHUB_REF_NAME")
+          if sha=$(git rev-parse -q --verify "HEAD:holidays.json"); then args+=(-f sha="$sha"); fi
+          gh api "${args[@]}" --jq .commit.html_url
