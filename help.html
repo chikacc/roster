@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>班表｜使用說明</title>
+<meta name="description" content="班表的使用說明：標記、標籤、版面、國定假日、文字輸入、產生圖片、日曆檔、備份與鍵盤操作。">
+<meta name="theme-color" content="#eef1f4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12171c" media="(prefers-color-scheme: dark)">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500;600;700&display=swap">
+<script>
+/* 跟班表用同一個主題設定 */
+try{ const t=(JSON.parse(localStorage.getItem("roster-v1")||"{}")||{}).theme; if(t==="light"||t==="dark") document.documentElement.setAttribute("data-theme",t); }catch(e){}
+</script>
+<style>
+:root{
+  --bg:#eef1f4; --sheet:#ffffff; --fg:#1b232c; --muted:#6a7581; --line:#dde3e9; --field:#f6f8fa;
+  --sun:#c0392b; --accent:#2b8a6e; --accent-bg:#dff0eb;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12171c; --sheet:#1a2128; --fg:#e7ecf0; --muted:#8f9ba6; --line:#2b353f; --field:#141a20;
+  --sun:#ef7d70; --accent:#6cc9b3; --accent-bg:#1d3a34; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#12171c; --sheet:#1a2128; --fg:#e7ecf0; --muted:#8f9ba6; --line:#2b353f; --field:#141a20;
+  --sun:#ef7d70; --accent:#6cc9b3; --accent-bg:#1d3a34; color-scheme:dark;}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:72px}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.75;
+  padding:env(safe-area-inset-top,0px) 16px calc(48px + env(safe-area-inset-bottom,0px))}
+a{color:var(--accent)}
+.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);margin:0 -16px;padding:10px 16px}
+.top .in{max-width:760px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.top b{font-size:1.05rem;font-weight:900;letter-spacing:.02em}
+.back{display:inline-flex;align-items:center;gap:6px;font-weight:700;text-decoration:none;border:1px solid var(--fg);color:var(--fg);border-radius:8px;padding:5px 12px;font-size:.9rem;white-space:nowrap}
+main{max-width:760px;margin:0 auto}
+h1{font-size:1.6rem;font-weight:900;margin:28px 0 4px}
+.lead{color:var(--muted);margin:0 0 18px}
+nav.toc{background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin:0 0 24px}
+nav.toc ol{margin:0;padding-left:1.4em;columns:2;column-gap:24px}
+nav.toc li{break-inside:avoid}
+@media (max-width:560px){nav.toc ol{columns:1}}
+section{background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:6px 18px 14px;margin:0 0 16px}
+h2{font-size:1.2rem;font-weight:900;margin:14px 0 6px}
+h3{font-size:1rem;font-weight:800;margin:16px 0 4px}
+p{margin:6px 0}
+ul,ol{margin:6px 0;padding-left:1.3em}
+li{margin:2px 0}
+code,kbd{font-family:var(--f-num);font-size:.88em;background:var(--field);border:1px solid var(--line);border-radius:5px;padding:0 .35em}
+kbd{border-bottom-width:2px}
+table{border-collapse:collapse;width:100%;font-size:.94rem;margin:8px 0}
+th,td{text-align:left;vertical-align:top;padding:6px 10px 6px 0;border-top:1px solid var(--line)}
+th{font-weight:700;white-space:nowrap;width:1%}
+.note{color:var(--muted);font-size:.92rem}
+.foot{max-width:760px;margin:24px auto 0;text-align:center;color:var(--muted);font-size:.85rem}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+</style>
+</head>
+<body>
+<div class="top"><div class="in"><b>班表・使用說明</b><a class="back" href="./">開啟班表</a></div></div>
+<main>
+<h1>使用說明</h1>
+<p class="lead">平常照著畫面操作就好；這裡寫的是給想仔細了解的人看的完整規則。</p>
+
+<nav class="toc" aria-label="目錄"><ol>
+  <li><a href="#start">開始使用</a></li>
+  <li><a href="#labels">標籤</a></li>
+  <li><a href="#layout">版面</a></li>
+  <li><a href="#holidays">國定假日與其他節日</a></li>
+  <li><a href="#text">文字輸入</a></li>
+  <li><a href="#export">產生圖片</a></li>
+  <li><a href="#ics">日曆檔</a></li>
+  <li><a href="#backup">資料與備份</a></li>
+  <li><a href="#demo">範例</a></li>
+  <li><a href="#keyboard">鍵盤操作</a></li>
+  <li><a href="#faq">常見問題</a></li>
+</ol></nav>
+
+<section id="start">
+<h2>開始使用</h2>
+<ul>
+  <li><b>標記</b>：在上方的標記工具列選一個標籤，再點日期。再點一次同一個標籤會取消。</li>
+  <li><b>連續塗</b>：電腦按住滑鼠拖過去；手機按住約 0.3 秒，等月曆出現外框再滑動。輕輕一滑是捲動頁面。</li>
+  <li><b>清除</b>：選「清除」再點日期，那天會回到「沒填時的預設」。</li>
+  <li><b>疊加</b>：開啟後，點日期會把標籤加上去，同一天可以放好幾個（例如早班加家教）。電腦上按住 <kbd>Shift</kbd> 再點，也可以只有這一下用疊加。</li>
+  <li><b>復原上一步</b>：大部分動作做完會出現「復原」，也可以按文字輸入區的「復原上一步」。只能復原最近一步。</li>
+  <li><b>手機上</b>：標記工具列是一列，標籤多時可以左右滑；右邊的橡皮擦是「清除」、兩層方塊是「疊加」（開啟時會顯示文字）、圖片是「產生圖片」。</li>
+  <li><b>設定區塊</b>：下方的標籤設定、文字輸入、版面、日曆檔、本月清單、整份資料備份都可以點標題展開或收起，收起時標題旁會顯示摘要；展開狀態會記住。</li>
+  <li><b>換月份</b>：點名稱旁的月份可以選年月，或直接輸入 <code>2027/3</code>、<code>3月</code>。有點的月份代表已經排過班。</li>
+</ul>
+</section>
+
+<section id="labels">
+<h2>標籤</h2>
+<p>每個月有自己的一份標籤，新的月份會沿用最近一個月（優先往前找）。顏色、時間和顯示名稱跟著名稱走，所有月份共用。</p>
+<h3 id="label-type">休假類和上班類</h3>
+<p>決定統計怎麼算：底部會分別列出休假幾天、上班幾天，有時間的上班標籤會加總成時數。文字輸入裡的 <code>休</code>、<code>休假</code>、<code>排休</code>、<code>off</code> 代表這個月的第一個休假類標籤。</p>
+<h3 id="label-style">顯示方式：實心、空心、隱藏</h3>
+<ul>
+  <li><b>實心</b>：填滿顏色，最醒目。</li>
+  <li><b>空心</b>：只有外框，適合次要的類別，例如特休。顏色太淺時文字會自動加深。</li>
+  <li><b>隱藏</b>：平常不顯示，適合當作「沒填時的預設」，例如上班族的「上班」——只要標休假，其他天自動算上班。要不要在畫面上預覽隱藏的標籤，在<a href="#layout-hidden">版面</a>裡設定。</li>
+</ul>
+<h3 id="label-default">沒填時的預設</h3>
+<p>沒有標記的日子都算這個標籤，統計和時數也會照它算。每個月只能有一個。</p>
+<h3 id="label-time">時間</h3>
+<ul>
+  <li>名稱像 <code>9-18</code>、<code>早班 7-15</code> 會自動判斷時間，也可以在「時間」欄自己填。</li>
+  <li><b>跨日班</b>：<code>22-6</code>、<code>23-7</code> 這種跨過午夜的班，可以選「算在開始那天」或「算在結束那天」。</li>
+  <li><b>30 小時制</b>：<code>18-26</code> 就是晚上 6 點到隔天凌晨 2 點，班記在開始那天，時數照實際時間算。</li>
+  <li>沒有時間的標籤是整天，不算時數，匯出日曆時是整天事件。</li>
+</ul>
+<h3 id="label-display">顯示名稱</h3>
+<p>月曆上要顯示的文字，例如把「晚班 18-22」顯示成「晚」。圖例會用左右兩段對照，例如「晚｜晚班 18-22」，所以格子裡寫短字也不會看不懂。</p>
+<p>手機的格子比較窄，名稱太長會縮得很小。如果某個標籤讓手機上整個月的字都變小（這個月有用到、沒有顯示名稱，而且比其他標籤長一截），標籤設定會出現「建議設短名稱」，點了直接跳到「顯示」欄位；不需要的話可以按「不用提示」。「只在格子太窄時顯示」的話，電腦上顯示完整名稱，手機和直式圖片才換成顯示名稱。</p>
+<h3 id="label-order">順序</h3>
+<p>順序會影響標記工具列、圖例、文字的排列，以及同一天沒有時間的標籤怎麼排（有時間的照開始時間排）。可以用上下箭頭調整，或在標記工具列按住標籤拖曳（手機按住 0.3 秒再拖）。鍵盤的 <kbd>1</kbd>–<kbd>9</kbd> 也照這個順序。</p>
+<h3 id="label-color">顏色</h3>
+<p>點標籤左邊的色塊選顏色。文字顏色會依底色自動選黑或白，確保看得清楚。顏色跟底色太接近時（例如深色模式用墨色），標籤會自動加上灰色框線，顏色本身不變；因為看起來可能像空心，標籤設定會出現「建議換顏色」，不想換可以按「不用提示」。</p>
+</section>
+
+<section id="layout">
+<h2>版面</h2>
+<h3 id="layout-content">月曆上的內容</h3>
+<p>「更多設定」最上面決定月曆上要放哪些東西；畫面、產生的圖片和列印都照這裡。</p>
+<ul>
+  <li><b>班表名稱</b>：顯示在月曆上方。第一次取名時會自動打開。</li>
+  <li><b>月份標題</b>：數字和文字、只有數字（大大的 9）、只有文字。</li>
+  <li><b>標題文字</b>：可以自由輸入，用下面的按鈕插入當月的內容：〔中文月份〕九月、〔數字月份〕9、〔英文月份〕September、〔英文縮寫〕Sep、〔和風月名〕長月、〔年份〕2028。例如「〔中文月份〕休假表」會顯示成「九月休假表」。沒有放月份的標記時，每個月都會顯示一樣的文字，下面會提醒。</li>
+  <li><b>圖例</b>：月曆下方的標籤顏色說明。有標籤用了顯示名稱（例如「早」）時關掉圖例，會提醒別人可能看不懂。</li>
+  <li><b>統計</b>：休假、上班幾天；<b>時數</b>跟著統計，統計關掉時沒有作用。</li>
+  <li><b>更新時間</b>、<b>超出格子的班別</b>（一格放不下時在月曆下方列出）。</li>
+  <li><b>星期的寫法</b>：日 一 二、Sun Mon Tue、S M T、日 月 火。</li>
+</ul>
+<p>產生圖片時也可以只改那一張，見<a href="#export">產生圖片</a>。</p>
+<h3 id="layout-rows">每格顯示幾個標籤</h3>
+<p>「自動」依這個月同一天最多有幾個標籤決定（最多 3 個）。放不下的會在日期旁標示「+1」，並列在月曆下方（可以在產生圖片時關掉）。</p>
+<h3 id="layout-size">標籤和日期大小</h3>
+<p>同一個月的標籤共用一個字級，由這個月「有設定」的標籤裡最長的那個決定，<b>就算這個月一天都沒用到也算</b>（隱藏的標籤不算，因為不會出現在圖片上）。所以清掉某一天，或這個月剛好沒排到某個班，字的大小都不會變。只有一兩個字的標籤也至少當作 3 個字寬來算，不會突然變很大。</p>
+<p>覺得字太小，通常是有某個標籤特別長：可以替它設一個短的<a href="#label-display">顯示名稱</a>，或把這個月用不到的標籤刪掉。「大」會讓短標籤再大一點，「小」則整體縮小。</p>
+<h3 id="layout-narrow">手機（窄格子）的顯示</h3>
+<ul>
+  <li>只放一個標籤的格子，時間會上下排：開始大、<code>~結束</code> 小。</li>
+  <li>放兩個以上的格子改成單行小字。兩種格子各自統一字級。</li>
+  <li>節日名稱放不下，只有日期變紅。</li>
+</ul>
+<h3 id="layout-adj">顯示前後月份的日期</h3>
+<p>在「更多設定」把「前後月份的日期」選成「顯示」後，月初、月底那一週的空格會補上前後月份的日期。那個月已經排過班的話，會半透明顯示當天的標籤（照那個月的標籤設定），方便看輪班有沒有接上；還沒排過的月份只顯示日期。點前後月份的日期會切到那個月，不會標記。只在畫面上顯示，不影響統計，產生的圖片和列印也不會出現。</p>
+<h3 id="layout-join">連續的日子連起來</h3>
+<p>在「更多設定」把「連續的日子」選成「連起來」後，同一個標籤連續好幾天時會連成一條，文字寫在每一段的正中間。相鄰兩天在格子裡同一行是同一個標籤就會連；一天兩個班時，同一個班如果因為時間順序排在不同行（例如一天是 18-22、19-22，另一天是 10-14、18-22），就不會連。連起來的部分用一行的高度。跨週時下一列重新寫字，斷開的那一側改成平邊，表示接下去。「跨月」預設是「在月底收邊」，月初、月底照常收成圓角；選「連到前後月」時，和已經排好的前後月份接得上也用平邊（有顯示前後月份的日期時直接連過去）。隱藏標籤的半透明預覽照同樣的規則連；前後月份的淡色日期有顯示時一起連，但不寫字。產生的圖片和列印也會照這個樣子。</p>
+<h3 id="layout-cell">格子樣式</h3>
+<p>「外框」（預設）每格一個細框；「淡色底」沒有框線，每格是很淡的底色；「無」只有日期和標籤，搭配「連續的日子連起來」最乾淨。產生的圖片和列印也照這個樣式。</p>
+<h3 id="layout-fill">標籤加高補滿空位</h3>
+<p>「不加高」每個標籤固定一行高；「加高一點」（預設）格子有空間時標籤加高，最多約 1.5 倍；「填滿」標籤平均分配整格的高度，只有一個標籤時佔整格。</p>
+<h3 id="layout-solo">只有一個標籤時的位置</h3>
+<p>每格顯示 2 個以上時，格子分成固定的幾行，同一列的格子行高一樣。一天有好幾個標籤時照順序排（整天在前，其他照開始時間）；只有一個標籤時：「對齊同一個班」（預設）放在這個月同一個班最常出現的那一行，例如晚班都在第二行，整週看起來像一條時間軸（這個月從來沒有和別的標籤同一天的標籤放在中間）；也可以一律「置頂」或「置底」。選「填滿」時不需要這個設定。</p>
+<h3 id="layout-hidden">隱藏的標籤怎麼顯示</h3>
+<ul>
+  <li><b>不顯示</b>：完全看不到。</li>
+  <li><b>只在編輯時預覽</b>：用半透明虛線顯示在畫面上，方便確認；不會出現在圖片、圖例和統計。目前選的標記工具是隱藏的標籤時，也會這樣預覽。</li>
+  <li><b>一律顯示</b>：用虛線顯示，也會出現在圖片、圖例和統計，沒填時的預設也會顯示。</li>
+</ul>
+</section>
+
+<section id="holidays">
+<h2>國定假日與其他節日</h2>
+<p>在「版面」設定：<b>國定假日</b>可以選不顯示、只標日期（放假日只有紅字）或顯示名稱；<b>補班日</b>另外控制，顯示時寫「補班」。都只是提示，不影響標記和統計。名稱最多顯示兩行；太長的官方名稱用常見簡稱，例如「臺灣光復暨金門古寧頭大捷紀念日」顯示成「光復節」、「開國紀念日」顯示成「元旦」。電腦上把滑鼠移到日期上可以看到全名。</p>
+<p class="note">資料來自行政院人事行政總處的「中華民國政府行政機關辦公日曆表」（政府資料開放平臺），每月自動更新。民間企業和各行業的放假日可能不同，以公司規定為準。</p>
+<h3 id="observances">其他節日（不放假）</h3>
+<p>在「版面 → 更多設定」把「其他節日（不放假）」選成「顯示」後，以下日子會用灰色小字標示，日期不會變紅。同一天有國定假日或補班時，格子裡顯示國定假日或補班。</p>
+<table>
+  <tr><th>固定日期</th><td>情人節（2/14）、婦女節（3/8）、植樹節（3/12）、父親節（8/8）、萬聖節（10/31）、聖誕節（12/25）</td></tr>
+  <tr><th>規則日期</th><td>母親節（5 月第二個星期日）、復活節（依公式計算）</td></tr>
+  <tr><th>農曆</th><td>元宵節（正月十五）、七夕（七月初七）、中元節（七月十五）、重陽節（九月初九）、尾牙（十二月十六）</td></tr>
+  <tr><th>節氣</th><td>冬至</td></tr>
+</table>
+<p class="note">農曆日期用瀏覽器內建的農曆計算；很舊的瀏覽器不支援時不會顯示農曆節日。冬至是預先算好的 2017–2050 年日期（東八區）。</p>
+</section>
+
+<section id="text">
+<h2>文字輸入</h2>
+<p>適合一次貼上整個月，或把班表以文字傳給別人。寫好按「套用到月曆」；「複製文字」會把目前的月份轉成文字。</p>
+<h3 id="text-formats">兩種排列</h3>
+<ul>
+  <li><b>以標籤為主</b>：<code>名稱: 日期</code>，例如 <code>晚班: 3 5 17-19</code>。</li>
+  <li><b>以日期為主</b>：<code>日期: 標籤</code>，例如 <code>1 2 8: 休</code>、<code>8: 10-14 18-22</code>（一天兩個班）。只有一個日期時可以省略冒號：<code>11/3 早班</code>。</li>
+</ul>
+<h3 id="text-settings">在名稱後面寫設定</h3>
+<p>依寫法自動判斷：時間 <code>18-22</code>、<code>休假</code>／<code>上班</code>、<code>實心</code>／<code>空心</code>／<code>隱藏</code>（<code>虛線</code> 也代表隱藏）、色碼 <code>#d9822b</code>、<code>算結束</code>（跨日班算結束那天）、<code>預設</code>，其他文字是顯示名稱。例如 <code>晚班 晚 18-22: 3 5</code>。勾選「包含標籤設定」，複製出來的文字也會帶這些設定。</p>
+<h3 id="text-match">標籤怎麼對應</h3>
+<p>依序用名稱、顯示名稱、時間比對，例如 <code>晚: 3</code>、<code>18-22: 3</code> 都會對到「晚班 18-22」；都找不到就新增一個標籤。</p>
+<h3 id="text-dates">月份和日期</h3>
+<ul>
+  <li>月份：<code>2026年11月</code>、<code>2026/06</code>、<code>2026-11</code>、<code>11月</code>、<code>十一月</code>，套用到後面的行；可以一次寫好幾個月，套用前會先確認。</li>
+  <li>日期：<code>3</code>、<code>3-5</code>、<code>11/3</code>、<code>2026/6/3</code>。</li>
+  <li>沒寫到的日子是「沒填時的預設」。<code>#</code> 開頭的行會被略過。</li>
+</ul>
+<h3 id="text-quotes">引號和容易誤會的寫法</h3>
+<ul>
+  <li>名稱有空格，或想讓「休假」這種字當成顯示名稱時，用引號：<code>「早 班」</code>、<code>"休假"</code>。</li>
+  <li><code>11-20: 3 17</code> 會當成「11-20 這個班在 3 號和 17 號」。日期範圍要配時間名稱的標籤時，日期分開寫或標籤加引號：<code>12 13 14: 18-22</code>、<code>12-14: 「18-22」</code>。</li>
+  <li>舊寫法也看得懂：<code>4跟18標註11-20</code>、<code>11-20 4.18</code>、只有數字的一行當作休假。</li>
+</ul>
+</section>
+
+<section id="export">
+<h2>產生圖片</h2>
+<ul>
+  <li><b>下載、複製、分享、列印</b>：依裝置顯示能用的按鈕。手機可以直接分享到 LINE 等 App，也可以長按預覽圖儲存。</li>
+  <li><b>班表名稱</b>：也是檔名的預設值。</li>
+  <li><b>這張圖片的內容</b>：班表名稱、月份標題、圖例、統計、時數、更新時間、超出格子的班別。打開視窗時從<a href="#layout-content">版面的「月曆上的內容」</a>帶入，在這裡改只影響這次產生的圖片，和版面不同的項目會標「（這張圖片限定）」；按「設成預設」把這些設定存回版面。</li>
+  <li><b>配色和版面</b>：淺色或深色；橫式適合電腦和平板，直式適合手機。</li>
+  <li><b>解析度</b>：預設是橫式 2000px、直式 1200px 寬；也可以符合這台裝置的螢幕寬度，或自訂 600–4000px。列印不受影響，會直接印出最清楚的版本。</li>
+  <li><b>檔名</b>：留空會用班表名稱，後面一律加上月份。如果下載後檔名變成亂碼或「download」，改填英文，例如 <code>my-roster</code>。</li>
+</ul>
+<p class="note">在 LINE、Facebook、Instagram 裡開啟時，不能直接下載或分享。請長按圖片儲存，或從選單改用瀏覽器開啟。</p>
+</section>
+
+<section id="ics">
+<h2>日曆檔（.ics）</h2>
+<h3 id="ics-export">匯出</h3>
+<p>選範圍（這個月、這個月起 3 個月、全部）和要匯出的標籤。名稱有時間的標籤（例如 <code>9-18</code>）會變成有時間的事件，其他的是整天事件。</p>
+<ul>
+  <li><b>iPhone</b>：下載後會直接問要不要加入行事曆。</li>
+  <li><b>Google 日曆</b>：用電腦開 Google 日曆網頁版 →「設定」→「匯入」。Android 的 Google 日曆 App 不能直接匯入。</li>
+  <li>重新匯入同一個月，Google 日曆可能會出現重複的事件。建議另外建一個「班表」日曆匯入到那裡；要更新時刪掉重建再匯入。</li>
+</ul>
+<h3 id="ics-import">匯入</h3>
+<p>選要匯入的月份，並把事件名稱對應到標籤。可以「只覆蓋有事件的日子」或「先清空這些月份再匯入」。重複事件不支援。檔案只在這個瀏覽器裡處理，不會上傳；電腦也可以直接把檔案拖到「日曆檔」那一區。</p>
+</section>
+
+<section id="backup">
+<h2>資料與備份</h2>
+<ul>
+  <li>所有資料只存在<b>這個瀏覽器</b>（localStorage），不會上傳到任何地方，也沒有任何追蹤或分析程式；匯入的日曆檔也只在瀏覽器裡讀取。</li>
+  <li>不同手機、不同瀏覽器之間的資料不會同步。清除瀏覽器資料、使用無痕模式，或 iPhone Safari 很久沒有打開，資料都可能被清掉，<b>請定期用「複製備份」保存</b>。換手機時，在新手機用「還原」貼回來就好。</li>
+  <li><b>複製備份</b>：產生一段文字，包含所有月份的標記、標籤和所有設定。存到備忘錄或傳給自己。</li>
+  <li><b>還原</b>：把備份文字貼到框裡，按「從備份還原全部資料」。會先告訴你備份的時間和月份，確認後取代這個瀏覽器目前的全部資料。</li>
+  <li><b>清除這個瀏覽器的所有資料</b>：在共用的電腦或借來的手機上用完，可以把所有月份的標記、標籤、班表名稱、版面和設定都清掉，回到第一次打開的樣子（「第一次使用？」的導引也會再出現）。確認視窗裡可以先複製備份。清除後在關掉頁面前，還可以按通知或「復原上一步」救回來；離開頁面後就無法復原。離線用的程式檔和國定假日資料不是個人資料，不會清掉。</li>
+  <li>可以加到主畫面當 App 使用，沒有網路也能開。</li>
+</ul>
+</section>
+
+<section id="demo">
+<h2>範例</h2>
+<p>「看範例」有六種情境。範例裡可以隨意點、塗、匯出、改設定，都不會存檔，也不會影響你的班表；每個範例有自己的版面設定。範例中不能備份或還原。喜歡某個範例，可以按「套用到我的班表…」，勾選要帶過去的標籤、這個月的排班、私人行程和版面設定，按「復原上一步」可以全部還原。</p>
+<h3 id="demo-months">每個月怎麼產生</h3>
+<ul>
+  <li>範例會產生你正在看的月份，切到其他月份也會自動產生。同一個月每次產生的結果都一樣。</li>
+  <li>會參考國定假日和補班日；國定假日資料還沒載入時，先照星期幾產生，載入後重新產生你還沒動過的月份。</li>
+  <li>每個月有一些小變化（例如休假落在不同天、偶爾換班），讓每個月看起來不像複製貼上。</li>
+</ul>
+<h3 id="demo-rules">範例裡示範的規則</h3>
+<table>
+  <tr><th>一般上班族<br>（小美）</th><td>週末、國定假日和補假放假，補班日照常上班，偶爾請一天特休。國定假日夾著一天上班日時請特休湊成連假；過年前一天請特休提早回家。生日 5/20 事先請好特休。每週三下班後去攀岩。喜歡日系手帳：班表名稱是「小美の班表」，月份用和風月名（神無月），星期寫成「日 月 火」。和小安是情侶：情人節、七夕、交往紀念日 3/27、小安的生日和他考完試的週末都有約會。</td></tr>
+  <tr><th>餐飲／零售<br>（阿哲）</th><td>一週休兩天，多半在平日；班別在 9-18、11-20、10-20 之間輪。三天以上的連假那幾天排滿 10-20 的長班，連假結束後補休兩天。生日 11/11 排休。每週挑一個休假日去上瑜珈。班表印出來貼在員工休息室，標籤一看就懂，所以不放圖例，月份只留數字；連假最忙，國定假日只標紅字，週末本來就上班，補班日也不顯示。</td></tr>
+  <tr><th>輪班制<br>（阿明）</th><td>早、中、夜各兩天再休兩天，跨月也接得起來。偶爾和同事換一次班。春節連假輪到值班，都上早班，之後補休兩天。生日 8/23 不特別安排。班一直輪、月底不會停，連起來的班接到前後月。</td></tr>
+  <tr><th>兼職打工<br>（小安）</th><td>大學生，一三五晚上和週六打工，偶爾把週三的班換到週四。學期中週一到週四有課（隱藏的「上課」）；寒暑假沒有課，7、8 月白天也排班。1 月和 6 月的期末考週平日標「考試」、不排班，考完的週六請假（空心，會出現在圖片上）。和小美是情侶：情人節、七夕和小美的生日 5/20 有班就請假；交往紀念日 3/27 跟同事把班換到隔天。自己的生日 9/21 照常上班。骨子裡有點中二：隱藏的標籤都取了顯示名稱（上課「修行」、考試「決戰」、約會「密會」、女友生日「女神降臨」、紀念日「締約之日」、生日「覺醒日」），反正圖片上看不到；會給店長看的部分（標題「十月打工表」、請假）一切正常。換季容易感冒，11 月會挑一天平日晚班請病假（每年不同天）。班表名稱取作「小安的打工戰記」，但設成不顯示在月曆上，平常都記得把檔名改成「打工班表」才傳給店長；只有某年 11 月感冒請假那次忘了改，店長從此叫他「打工戰士」。他現在還是每次都改，雖然早就沒用了。</td></tr>
+  <tr><th>護理師三班制<br>（怡君）</th><td>白班、小夜、大夜各四天，中間放休和例，跨月也接得起來。國定假日上班的話，之後第一個休息日補成「國」。偶爾請一天特休。每個月大夜班結束後的休假去按摩。生日 12/8 跟同事換成白班。每年有一個月把休假集中起來出國 ✈。醫院的班表習慣用英文縮寫，星期寫成 S M T。</td></tr>
+  <tr><th>深夜營業<br>（阿凱）</th><td>週三、四、日 18-26，週五、六 20-29（30 小時制），每月多上或少上一天。12 月 31 日跨年夜上 20-30（到早上 6 點），1 月 1 日休息。真正的生日是 2/29，四年才一次，只有熟人知道，用隱藏的「Birthday」；那天照常上班、隔天休息。店裡每三個月（1、4、7、10 月）挑個週五或週六辦一次生日趴拉業績，用空心的「B-DAY」疊在當天的班上，會出現在圖片上，客人問起就說今天生日。店裡有外籍調酒師，班表一律用英文（Kai's Shifts；月份標題只寫文字「October 2026」；星期 Sun Mon；標籤直接叫 OFF、B-DAY、Birthday）；只在意哪天上班，不放統計；國定假日照常營業，國定假日和補班日都不顯示。</td></tr>
+</table>
+<p class="note">私人行程（上課、考試、生日、約會、攀岩、瑜珈、按摩等）都設成隱藏：只在編輯時半透明預覽，產生的圖片不會出現。</p>
+<p class="note">在範例的介紹下方按「看答案」，可以直接跳到最近一次發生這些事的月份。</p>
+</section>
+
+<section id="keyboard">
+<h2>鍵盤操作</h2>
+<p>電腦上可以只用鍵盤排班。在畫面上按 <kbd>?</kbd> 會顯示這份清單。正在輸入文字時，快捷鍵不會作用。</p>
+<table>
+  <tr><th><kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd></th><td>在日期之間移動（上下是前後一週）</td></tr>
+  <tr><th><kbd>Shift</kbd>＋方向鍵</th><td>連續塗：先標記目前這一天，再一路標記經過的日子，規則和滑鼠拖曳一樣（第一格決定是標記還是擦掉）。放開 Shift 結束這一筆，可以一次復原；按 Esc 取消這一筆</td></tr>
+  <tr><th><kbd>Home</kbd> <kbd>End</kbd></th><td>這一週的第一天／最後一天</td></tr>
+  <tr><th><kbd>Enter</kbd> <kbd>空白鍵</kbd></th><td>用目前的標籤標記這一天</td></tr>
+  <tr><th><kbd>Delete</kbd> <kbd>Backspace</kbd></th><td>清除這一天</td></tr>
+  <tr><th><kbd>Page Up</kbd> <kbd>Page Down</kbd></th><td>上個月／下個月</td></tr>
+  <tr><th><kbd>1</kbd>–<kbd>9</kbd></th><td>選標記工具列上的第幾個標籤</td></tr>
+  <tr><th><kbd>0</kbd></th><td>選「清除」</td></tr>
+  <tr><th><kbd>Insert</kbd></th><td>開關「疊加」</td></tr>
+  <tr><th><kbd>Shift</kbd>＋點日期</th><td>這一下用疊加（不改變開關）</td></tr>
+  <tr><th><kbd>Ctrl</kbd>／<kbd>⌘</kbd>＋<kbd>Z</kbd></th><td>復原上一步</td></tr>
+  <tr><th><kbd>?</kbd></th><td>顯示快捷鍵清單</td></tr>
+</table>
+</section>
+
+<section id="faq">
+<h2>常見問題</h2>
+<h3>換手機後資料不見了？</h3>
+<p>資料只存在原本的瀏覽器。在舊手機按「複製備份」，把文字傳到新手機，再貼上還原。</p>
+<h3>手機上的標籤字很小？</h3>
+<p>通常是名稱太長或只寫時間。替標籤設一個短的<a href="#label-display">顯示名稱</a>，例如「早」「晚」。</p>
+<h3>國定假日沒有顯示？</h3>
+<p>確認「版面」裡的「國定假日和補班」選了「顯示」。手機上格子比較窄，只會把日期變紅，不顯示名稱。</p>
+<h3>下載的檔名變成「download」？</h3>
+<p>有些瀏覽器不支援中文檔名。在產生圖片的「檔名」改填英文。</p>
+</section>
+</main>
+<p class="foot">班表 · <a href="https://github.com/chikacc/roster" target="_blank" rel="noopener">原始碼</a> · MIT 授權</p>
+</body>
+</html>

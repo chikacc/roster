@@ -1,9 +1,9 @@
 /* 班表：離線快取
-   網頁本身（index.html）每次先連網拿最新版，沒網路才用快取；
+   網頁（index.html、help.html）每次先連網拿最新版，沒網路才用快取；
    圖示、程式庫用快取；換了 vendor 或 icons 裡的檔案時，把 CACHE 的版本號加 1。 */
-const CACHE = "roster-v1";
+const CACHE = "roster-v2";
 const CORE = [
-  "./", "index.html", "manifest.webmanifest",
+  "./", "index.html", "help.html", "manifest.webmanifest",
   "vendor/html2canvas.min.js",
   "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png", "icons/maskable-512.png"
 ];
@@ -19,8 +19,8 @@ self.addEventListener("fetch", e => {
   const url = new URL(req.url);
   // 網頁：先連網，失敗才用快取
   if (req.mode === "navigate") {
-    e.respondWith(fetch(req).then(res => { const copy = res.clone(); caches.open(CACHE).then(c => c.put("index.html", copy)); return res; })
-      .catch(() => caches.match("index.html")));
+    e.respondWith(fetch(req).then(res => { const copy = res.clone(); if (res.ok) caches.open(CACHE).then(c => c.put(req, copy)); return res; })
+      .catch(() => caches.match(req, { ignoreSearch: true }).then(hit => hit || caches.match(url.pathname.endsWith("/help.html") ? "help.html" : "index.html"))));
     return;
   }
   // 國定假日資料：先連網拿最新的，沒網路才用快取
