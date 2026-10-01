@@ -96,13 +96,14 @@ a.btn{text-decoration:none}
 .topbar{position:sticky;top:calc(env(safe-area-inset-top,0px) - var(--stickoff,0px));z-index:5;background:var(--bg);display:flex;flex-direction:column;gap:10px;padding-top:8px;margin-top:-8px;border-bottom:1px solid var(--line)}
 .brushbar{padding-bottom:8px;display:flex;align-items:flex-start;gap:8px}
 .brushbar>.brushes{flex:1;min-width:0}
-.brushbar>#exportBtn{flex:none}
+.brushbar>#exportBtn{flex:none;font-size:.92rem;font-weight:700;line-height:1.5;padding:6px 12px;border-radius:7px}
+.brushbar .brush .ico,.brushbar>#exportBtn .ico{width:1.1em;height:1.1em}
 .blist{display:contents}
 /* 上方：班表名稱和月份同一列（手機上月份換到第二列） */
 .apphead .monthnav{order:2}
 .apphead .headr{order:3;margin-left:auto}
 @media (max-width:760px){ .apphead .appname{flex:1;min-width:0} .apphead .monthnav{order:4;flex-basis:100%} .appname h1{overflow:hidden;text-overflow:ellipsis;white-space:nowrap} }
-/* 手機：標籤列一列左右滑，清除、疊加、產生圖片固定在右邊；按鈕只留圖示（疊加開啟時顯示文字） */
+/* 手機：標籤列一列左右滑，清除、追加、產生圖片固定在右邊；按鈕只留圖示（追加開啟時顯示文字） */
 @media (max-width:560px){
   .brushbar .brushes{flex-wrap:wrap}
   .brushbar .brushes .hint{flex-basis:100%}
@@ -114,6 +115,7 @@ a.btn{text-decoration:none}
   .blist .brush{flex:none}
   .brush.clear .lbl,.brush.stacktog[aria-pressed="false"] .lbl,#exportBtn .lbl{display:none}
   .brush.clear,.brush.stacktog,#exportBtn{flex:none;padding-inline:9px}
+  .brush.clear,.brush.stacktog,.brushbar>#exportBtn{min-height:calc(.92rem * 1.5 + 14px);justify-content:center}
   .brushbar{align-items:flex-end}
   #helpBtn .lbl{display:none}
   .demochip .dl{display:none}
@@ -123,7 +125,7 @@ a.btn{text-decoration:none}
 .brush{font:inherit;font-size:.92rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;
   padding:5px 12px;border-radius:7px;border:2px solid transparent;background:var(--c,var(--sheet));color:var(--t,var(--fg));
   box-shadow:0 0 0 1px var(--line)}
-.brush.clear{background:var(--sheet);color:var(--fg);border:1px solid var(--line);box-shadow:none;gap:5px}
+.brush.clear{background:var(--sheet);color:var(--fg);border:1px solid var(--line);box-shadow:none;gap:5px;padding-block:6px}
 .brush[aria-pressed="true"]{outline:3px solid var(--fg);outline-offset:2px}
 /* 拖曳排序 */
 .brushes.dragging .brush[data-b]{cursor:grabbing}
@@ -469,6 +471,64 @@ kbd{font-family:var(--f-num);font-size:.8rem;border:1px solid var(--line);border
 
 /* panels */
 .panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+
+/* 自己會捲動的區塊：細卷軸、跟著主題換色（頁面本身的卷軸維持瀏覽器預設） */
+:root{--sb:#c5cdd5;--sbh:#9aa5b0}
+:root[data-theme="dark"]{--sb:#3a4652;--sbh:#55626f}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--sb:#3a4652;--sbh:#55626f}}
+:is(.panel.peek>.pbody,.xbody,.hvbody,.modal .box,.maincol){scrollbar-width:thin;scrollbar-color:var(--sb) transparent}
+:is(.panel.peek>.pbody,.xbody,.hvbody,.modal .box,.maincol)::-webkit-scrollbar{width:10px;height:10px}
+:is(.panel.peek>.pbody,.xbody,.hvbody,.modal .box,.maincol)::-webkit-scrollbar-track{background:transparent}
+:is(.panel.peek>.pbody,.xbody,.hvbody,.modal .box,.maincol)::-webkit-scrollbar-thumb{background:var(--sb);border-radius:10px;border:3px solid transparent;background-clip:padding-box}
+:is(.panel.peek>.pbody,.xbody,.hvbody,.modal .box,.maincol)::-webkit-scrollbar-thumb:hover{background-color:var(--sbh)}
+/* 窄螢幕：設定都從下方浮上來；下方一排入口 */
+.dock{display:none}
+.peekdone,.grab{display:none}
+@media (max-width:1099.98px){
+  body{padding-bottom:calc(64px + env(safe-area-inset-bottom,0px))}
+  :root.peeking:not(.peekfull) body{padding-bottom:calc(52vh + 64px)}
+  .sidecol .panel:not(.peek){display:none}
+  .sidecol .panels{display:contents}
+  .dock{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:35;margin:0 auto;max-width:640px;justify-content:space-around;gap:4px;
+    padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));background:var(--sheet);border-top:1px solid var(--line);box-shadow:0 -6px 18px -12px rgba(0,0,0,.4)}
+  @media (min-width:641px){ .dock{border:1px solid var(--line);border-bottom:none;border-radius:14px 14px 0 0} }
+  .dockbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font:inherit;font-size:.72rem;font-weight:700;color:var(--muted);background:none;border:none;border-radius:10px;padding:5px 2px;cursor:pointer}
+  .dockbtn .ico{width:1.4em;height:1.4em}
+  .dockbtn[aria-pressed="true"]{color:var(--fg);background:var(--field)}
+  .dockmenu{position:absolute;right:8px;bottom:calc(100% + 8px);display:flex;flex-direction:column;align-items:stretch;min-width:180px;padding:6px;background:var(--sheet);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.22)}
+  .dockmenu .btn{justify-content:flex-start;border:none}
+  .ready .dockmenu:not([hidden]){animation:popin .14s ease-out;transform-origin:bottom right}
+  :root.peeking .topbar{position:static}
+  /* 標題列固定不捲，只有內容捲；比較寬的畫面上最寬 640px、置中；在入口那排的上面 */
+  .panel.peek{position:fixed;left:0;right:0;bottom:calc(58px + env(safe-area-inset-bottom,0px));margin:0 auto;width:100%;max-width:640px;z-index:30;max-height:calc(50vh - 20px);overflow:hidden;gap:0;
+    border-radius:16px 16px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.25);padding:0}
+  .panel.peek.full{max-height:calc(100dvh - 58px - env(safe-area-inset-bottom,0px) - 24px - env(safe-area-inset-top,0px));height:calc(100dvh - 58px - env(safe-area-inset-bottom,0px) - 24px - env(safe-area-inset-top,0px))}
+  .panel.peek>h2{flex:none;padding:16px 16px 10px;border-bottom:1px solid var(--line);position:relative;touch-action:none;cursor:grab}
+  .panel.peek>h2 .grab{display:block;position:absolute;top:6px;left:50%;width:36px;height:4px;margin-left:-18px;border-radius:4px;background:var(--line)}
+  .panel.peek>h2 .pchev{display:none}
+  .panel.peek>h2 .ptog{pointer-events:none}
+  .panel.peek .peekdone{display:inline-flex;font-size:.85rem;padding:4px 14px;margin-left:6px}
+  .panel.peek>.pbody{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:12px 10px 16px 16px;scrollbar-gutter:stable}
+  .panel.peek>.pbody[hidden]{display:flex}
+  .ready .panel.peek{animation:peekup .22s cubic-bezier(.2,.7,.3,1)}
+  .toastbox{bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+}
+@keyframes peekup{from{transform:translateY(40%);opacity:.4}to{transform:none;opacity:1}}
+/* 版面：窄螢幕上下排；寬螢幕左右兩欄，月曆在左邊固定，設定在右邊捲（調設定時月曆一直看得到） */
+.layout{display:flex;flex-direction:column;gap:14px}
+.maincol{display:flex;flex-direction:column;gap:14px;min-width:0}
+.sidecol{min-width:0}
+@media (min-width:1100px){
+  .wrap{max-width:1480px}
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 380px;align-items:stretch;gap:16px}
+  .maincol>*{flex-shrink:0}
+  /* 月曆跟著捲動固定在上方；寬度依畫面高度限制，6 列的月份也整張放得下 */
+  .maincol>.sheet{position:sticky;top:calc(var(--toph,0px) + 12px)}
+  :root:not(.exporting) .maincol>.sheet{width:100%;max-width:max(560px,calc((100vh - var(--toph,0px) - 250px) * 1.46 + 60px));margin-inline:auto}
+  .sidecol .panels{grid-template-columns:1fr}
+  .dock{display:none!important}
+}
+
 .panel{background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:14px 16px;min-width:0;display:flex;flex-direction:column;gap:10px}
 .panel h2{margin:0;font-size:.95rem;letter-spacing:.04em}
 .panel p{margin:0;font-size:.82rem;color:var(--muted)}
@@ -495,7 +555,7 @@ input[type="text"]{font:inherit;font-family:var(--f-num);font-size:.95rem;width:
 .lab .lmove .icon-btn{min-width:2rem;padding:5px}
 .lab .ltime{grid-column:2/-1;display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;font-size:.86rem}
 .lab .ltime input{width:13em;flex:0 1 13em}
-.brush.stacktog{background:var(--sheet);color:var(--fg);border:1px solid var(--line);box-shadow:none;gap:5px;font-weight:700}
+.brush.stacktog{background:var(--sheet);color:var(--fg);border:1px solid var(--line);box-shadow:none;gap:5px;font-weight:700;padding-block:6px}
 .brush.stacktog[aria-pressed="true"]{background:var(--btn);color:var(--btn-fg);border-color:var(--btn);outline:none}
 .lab .count{font-size:.8rem;color:var(--muted);font-family:var(--f-num);margin-left:auto}
 .lab select{font:inherit;font-size:.88rem;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--field);color:var(--fg)}
@@ -649,16 +709,6 @@ input[type="text"]{font:inherit;font-family:var(--f-num);font-size:.95rem;width:
   </div>
   <div class="brushbar"><div class="brushes" id="brushes" role="group" aria-label="標記工具"></div><button class="btn primary" id="exportBtn" type="button" data-icon="image" title="產生圖片"><span class="lbl">產生圖片</span></button></div>
   </div>
-  <div class="demobar" id="demoBar" hidden role="region" aria-label="範例預覽">
-    <div class="row">
-      <p><b>範例預覽中</b>：可以隨意點、塗、匯出、改設定，都不會影響你的班表。</p>
-      <div class="actions"><button class="btn primary" id="demoApply" type="button"></button><button class="btn" id="demoExit" type="button">離開範例</button></div>
-    </div>
-    <div class="demopick" role="group" aria-label="範例情境" id="demoPick"></div>
-    <p id="demoDesc"></p>
-    <p class="egg">每個人在不同月份會有不同的安排，切到其他月份看看。<button class="linkbtn" id="eggBtn" type="button" aria-expanded="false" aria-controls="eggAns">看答案</button></p>
-    <div class="eggans" id="eggAns" hidden></div>
-  </div>
   <div class="toastbox" id="toastbox" aria-live="polite"></div>
   <div class="helpview" id="helpView" hidden role="dialog" aria-modal="true" aria-labelledby="helpTitle">
     <div class="hvtop"><div class="in"><button class="btn quiet" id="helpClose" type="button" data-icon="x"><span class="lbl">關閉</span></button><b id="helpTitle">使用說明</b><span></span></div></div>
@@ -684,8 +734,8 @@ input[type="text"]{font:inherit;font-family:var(--f-num);font-size:.95rem;width:
         <tr><th><kbd>Page Up</kbd><kbd>Page Down</kbd></th><td>上個月／下個月</td></tr>
         <tr><th><kbd>1</kbd>–<kbd>9</kbd></th><td>選標記工具列上的第幾個標籤</td></tr>
         <tr><th><kbd>0</kbd></th><td>選「清除」</td></tr>
-        <tr><th><kbd>Insert</kbd></th><td>開關「疊加」</td></tr>
-        <tr><th><kbd>Shift</kbd>＋點日期</th><td>這一下用疊加（不改變開關）</td></tr>
+        <tr><th><kbd>Insert</kbd></th><td>開關「追加」</td></tr>
+        <tr><th><kbd>Shift</kbd>＋點日期</th><td>這一下用追加（不改變開關）</td></tr>
         <tr><th><kbd>Ctrl</kbd>／<kbd>⌘</kbd>＋<kbd>Z</kbd></th><td>復原上一步</td></tr>
         <tr><th><kbd>?</kbd></th><td>顯示這份清單</td></tr>
       </table>
@@ -792,11 +842,23 @@ input[type="text"]{font:inherit;font-family:var(--f-num);font-size:.95rem;width:
     </div>
   </div>
 
+  <div class="layout" id="layout">
+  <div class="maincol" id="maincol">
+  <div class="demobar" id="demoBar" hidden role="region" aria-label="範例預覽">
+    <div class="row">
+      <p><b>範例預覽中</b>：可以隨意點、塗、匯出、改設定，都不會影響你的班表。</p>
+      <div class="actions"><button class="btn primary" id="demoApply" type="button"></button><button class="btn" id="demoExit" type="button">離開範例</button></div>
+    </div>
+    <div class="demopick" role="group" aria-label="範例情境" id="demoPick"></div>
+    <p id="demoDesc"></p>
+    <p class="egg">每個人在不同月份會有不同的安排，切到其他月份看看。<button class="linkbtn" id="eggBtn" type="button" aria-expanded="false" aria-controls="eggAns">看答案</button></p>
+    <div class="eggans" id="eggAns" hidden></div>
+  </div>
   <div class="guide" id="guide" hidden>
     <h2>第一次使用？</h2>
     <ol>
       <li>在上方選一個標籤（例如「休」），點日期就能標記；按住再滑動可以一次塗好幾天。</li>
-      <li>也可以在下方的<button class="linkbtn" type="button" data-openpanel="text">「文字輸入」</button>一次貼上整個月。</li>
+      <li>也可以用<button class="linkbtn" type="button" data-openpanel="text">「文字輸入」</button>一次貼上整個月。</li>
       <li>完成後按「產生圖片」，可以下載、複製或分享出去。</li>
     </ol>
     <div class="actions"><button class="btn primary" id="guideDemo" type="button">看範例</button><button class="btn quiet" id="guideClose" type="button">不用了</button></div>
@@ -812,7 +874,9 @@ input[type="text"]{font:inherit;font-family:var(--f-num);font-size:.95rem;width:
     <div class="foot"><span id="counts"></span><span id="stamp"></span></div>
     <div class="overnote" id="overNote" hidden></div>
   </section>
+  </div>
 
+  <aside class="sidecol" id="sidecol" aria-label="設定">
   <div class="panels">
     <div class="panel">
       <h2>文字輸入 <button class="info" type="button" data-info="text" aria-label="文字輸入的說明"></button></h2>
@@ -923,14 +987,31 @@ input[type="text"]{font:inherit;font-family:var(--f-num);font-size:.95rem;width:
         <p class="xhint">在共用的電腦或借來的手機上用完，可以把資料清掉。</p></div>
     </div>
   </div>
+  </aside>
+  </div>
+  <nav class="dock" id="dock" aria-label="設定">
+    <button class="dockbtn" type="button" data-dock="labels" aria-pressed="false" data-icon="tag"><span>標籤</span></button>
+    <button class="dockbtn" type="button" data-dock="layout" aria-pressed="false" data-icon="grid"><span>版面</span></button>
+    <button class="dockbtn" type="button" data-dock="text" aria-pressed="false" data-icon="text"><span>文字</span></button>
+    <button class="dockbtn" type="button" data-dock="more" aria-pressed="false" aria-haspopup="menu" data-icon="dots"><span>更多</span></button>
+    <div class="dockmenu" id="dockMenu" hidden role="menu">
+      <button class="btn quiet" type="button" role="menuitem" data-dockgo="lists">本月清單</button>
+      <button class="btn quiet" type="button" role="menuitem" data-dockgo="ics">日曆檔（.ics）</button>
+      <button class="btn quiet" type="button" role="menuitem" data-dockgo="backup">整份資料備份</button>
+    </div>
+  </nav>
   <footer class="appfoot">班表 <span id="appVer"></span> · <a href="help.html" target="_blank" rel="noopener">使用說明</a> · <a href="https://github.com/chikacc/roster" target="_blank" rel="noopener">原始碼</a> · MIT 授權</footer>
 </div>
 
 <script src="vendor/html2canvas.min.js"></script>
 <script>
 const APP="班表", UNTITLED="未命名班表", FILE_DEFAULT="roster";
-const VERSION="1.1.0";
+const VERSION="1.2.0";
 const ICON={
+  tag:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>',
+  grid:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10M15 10v10"/></svg>',
+  text:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>',
+  dots:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg>',
   sun:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
   moon:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>',
   monitor:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>',
@@ -1433,7 +1514,7 @@ function renderBrushes(){
   $("brushes").innerHTML=(demo?`<button class="demochip" type="button" id="demoChip" title="正在看範例，按一下回到你的班表" aria-label="範例中，按一下離開">範例<span class="dl">中・離開</span> ✕</button>`:"")+(empty?`<span class="hint">點日期標記，按住可連續塗：</span>`:"")+
     `<div class="blist" id="blist">`+md.labels.map(l=>`<button class="brush${l.style==="hidden"?" hid":l.style==="outline"?" outline":""}" type="button" data-b="${esc(l.name)}" style="${cvars(l.name)}" aria-pressed="${brush===l.name}" title="${l.style==="hidden"?"這個標籤目前隱藏。":""}按住拖曳可以調整順序" aria-label="${esc(l.name)}${l.style==="hidden"?"（隱藏）":""}">${esc(l.name)}</button>`).join("")+
     `</div><button class="brush clear" type="button" data-b="${CLEAR}" aria-pressed="${brush===CLEAR}" aria-label="清除" title="清除：點日期回到沒填時的預設">${ICON.eraser}<span class="lbl">清除</span></button>`+
-    `<button class="brush stacktog" type="button" id="stackBtn" aria-pressed="${!!S.stack}" aria-label="疊加" title="開啟後，點日期會把標籤加上去，同一天可以有好幾個">${ICON.layers}<span class="lbl">疊加</span></button>`;
+    `<button class="brush stacktog" type="button" id="stackBtn" aria-pressed="${!!S.stack}" aria-label="追加" title="開啟後，點日期會在原本的標籤再加一個；點已經有的標籤會拿掉它。同一天可以有好幾個標籤">${ICON.layers}<span class="lbl">追加</span></button>`;
   if(same&&typeof canAnim==="function"&&canAnim()){ const now=new Set(md.labels.map(l=>l.name)), had=new Set(old.map(o=>o.n));
     document.querySelectorAll("#blist .brush[data-b]").forEach(b=>{ if(!had.has(b.dataset.b)) b.classList.add("bpop"); });
     old.forEach(o=>{ if(!now.has(o.n)) ghostOut(o.b,"brush",o.r); }); }
@@ -1778,7 +1859,7 @@ document.querySelectorAll(".tokbtn").forEach(b=>b.onclick=()=>{ const el=$("tplI
 
 
 /* ---------- 點格子 ----------
-   疊加關閉：換成目前的標籤（已經只有它就清掉）　疊加開啟：加上目前的標籤（已經有就只拿掉它） */
+   追加關閉：換成目前的標籤（已經只有它就清掉）　追加開啟：加上目前的標籤（已經有就只拿掉它） */
 let suppressNextClick=false;   // 拖曳結束後，瀏覽器補發的那一下 click 不算
 $("grid").addEventListener("click",e=>{
   if(suppressNextClick){suppressNextClick=false;return;}
@@ -1786,7 +1867,7 @@ $("grid").addEventListener("click",e=>{
   const d=+b.dataset.d, [,mm]=ym(); snapshot(`修改 ${mm}/${d}`);
   const md=monthData(true), cur=dayList(md,d);
   if(brush===CLEAR) setDayList(md,d,[]);
-  else if(S.stack||e.shiftKey) setDayList(md,d,cur.includes(brush)?cur.filter(x=>x!==brush):[...cur,brush]);   // 按住 Shift：這一下用疊加
+  else if(S.stack||e.shiftKey) setDayList(md,d,cur.includes(brush)?cur.filter(x=>x!==brush):[...cur,brush]);   // 按住 Shift：這一下用追加
   else setDayList(md,d,cur.length===1&&cur[0]===brush?[]:[brush]);
   const added=dayList(md,d).some(x=>!cur.includes(x));
   touch(); render();
@@ -1796,13 +1877,13 @@ $("grid").addEventListener("click",e=>{
 $("brushes").addEventListener("click",e=>{
   if(suppressBrushClick){ suppressBrushClick=false; return; }
   if(e.target.closest("#demoChip")){ exitDemo(); notify("info","已離開範例，回到你自己的班表"); return; }
-  if(e.target.closest("#stackBtn")){ S.stack=!S.stack; if(realS) realS.stack=S.stack; saveReal(); renderBrushes(); notify("info",S.stack?"疊加開啟：點日期會把標籤加上去":"疊加關閉：點日期會換成選的標籤"); return; }
+  if(e.target.closest("#stackBtn")){ S.stack=!S.stack; if(realS) realS.stack=S.stack; saveReal(); renderBrushes(); notify("info",S.stack?"追加開啟：點日期會把標籤加上去":"追加關閉：點日期會換成選的標籤"); return; }
   const b=e.target.closest(".brush"); if(!b) return;
   brush=b.dataset.b; render({skipLabs:true});
 });
 
 /* ---------- 拖曳標籤調整順序 ----------
-   電腦：按住滑鼠拖曳；手機：按住 0.3 秒後拖曳（輕點還是選標籤）。「清除」「疊加」不能拖。 */
+   電腦：按住滑鼠拖曳；手機：按住 0.3 秒後拖曳（輕點還是選標籤）。「清除」「追加」不能拖。 */
 let bdrag=null, bpend=null, suppressBrushClick=false;
 const labelBrush=el=>{const b=el&&el.closest&&el.closest("#brushes .brush[data-b]");return b&&b.dataset.b!==CLEAR?b:null;};
 const labelBtns=()=>[...document.querySelectorAll("#brushes .brush[data-b]")].filter(b=>b.dataset.b!==CLEAR);
@@ -1875,7 +1956,7 @@ $("brushes").addEventListener("contextmenu",e=>{ if(labelBrush(e.target)) e.prev
 
 /* ---------- 連續塗 ----------
    手機：按住 0.3 秒後滑動；一碰就滑是捲動頁面。電腦：按住滑鼠直接拖曳。
-   第一格決定這次做什麼：疊加關閉＝換成目前的標籤（第一格已經只有它就是擦掉）；疊加開啟＝加上（第一格已經有它就是拿掉）；「清除」＝全部改回預設。 */
+   第一格決定這次做什麼：追加關閉＝換成目前的標籤（第一格已經只有它就是擦掉）；追加開啟＝加上（第一格已經有它就是拿掉）；「清除」＝全部改回預設。 */
 const HOLD_MS=300, MOVE_TOL=8;
 let paint=null, pending=null;
 const cellAt=(x,y)=>{const el=document.elementFromPoint(x,y);const c=el&&el.closest&&el.closest("#grid .cell[data-d]");return c?+c.dataset.d:null;};
@@ -1953,7 +2034,7 @@ grid.addEventListener("touchend",touchEnd,{passive:false});
 grid.addEventListener("touchcancel",touchEnd,{passive:false});
 grid.addEventListener("keydown",()=>{suppressNextClick=false;});
 grid.addEventListener("contextmenu",e=>{ if(e.target.closest(".cell[data-d]")) e.preventDefault(); });
-let mouseDown=null, stackOnce=false;   // stackOnce：按住 Shift 拖曳時，這次連續塗用疊加
+let mouseDown=null, stackOnce=false;   // stackOnce：按住 Shift 拖曳時，這次連續塗用追加
 grid.addEventListener("mousedown",e=>{
   if(e.button!==0||Date.now()-lastTouch<800) return;
   suppressNextClick=false;
@@ -1969,7 +2050,7 @@ window.addEventListener("mouseup",()=>{ if(paint&&mouseDown) paintEnd(); mouseDo
 
 /* ---------- 鍵盤操作 ----------
    日期上：方向鍵、Home／End 移動，Enter／空白鍵標記，Delete／Backspace 清除這一天
-   任何地方：Page Up／Page Down 換月份、1–9 選標籤、0 選「清除」、Insert 切換疊加、Ctrl／⌘＋Z 復原、? 顯示快捷鍵
+   任何地方：Page Up／Page Down 換月份、1–9 選標籤、0 選「清除」、Insert 切換追加、Ctrl／⌘＋Z 復原、? 顯示快捷鍵
    正在輸入文字或開著對話框時不作用 */
 const typingIn=el=>!!(el&&(el.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)));
 const modalOpen=()=>[...document.querySelectorAll(".modal")].some(m=>!m.hidden)||!$("helpView").hidden;
@@ -2066,6 +2147,8 @@ const PANELS=[["labels","#labs"],["text","#textIn"],["layout",'details[data-more
     if(info) h.appendChild(info);
     const body=document.createElement("div"); body.className="pbody"; body.id="pb-"+id;
     while(h.nextSibling) body.appendChild(h.nextSibling); pn.appendChild(body);
+    h.insertAdjacentHTML("afterbegin",`<span class="grab" aria-hidden="true"></span>`);
+    h.insertAdjacentHTML("beforeend",`<button class="btn primary peekdone" type="button" data-sheetclose="1">完成</button>`);
     const open=ui["p-"+id]!=null?!!ui["p-"+id]:id==="labels";
     setPanel(id,open,false);
     h.querySelector(".ptog").onclick=()=>setPanel(id,pn.classList.contains("closed"),true);
@@ -2077,6 +2160,46 @@ function setPanel(id,open,remember){
   $("pb-"+id).hidden=!open;
   if(remember){ let ui={}; try{ ui=JSON.parse(localStorage.getItem(UI_KEY)||"{}")||{}; }catch(e){} ui["p-"+id]=open; try{ localStorage.setItem(UI_KEY,JSON.stringify(ui)); }catch(e){} }
 }
+/* ---------- 窄螢幕：月曆一直在畫面上，設定從下方浮上來 ----------
+   下方固定一排入口（標籤、版面、文字、更多）；標籤和版面開半高（上面看得到月曆），其他開接近全高；標題列可以往上拉成全高、往下拉收起 */
+const NARROW=window.matchMedia("(max-width:1099.98px)");
+const HALF=new Set(["labels","layout"]);
+let peekPanel=null;
+function setPeek(id,full){
+  const was=peekPanel;
+  if(was){ const pn=document.querySelector(`.panel[data-panel="${was}"]`); if(pn) pn.classList.remove("peek","full"); }
+  peekPanel=id||null; rootEl.classList.toggle("peeking",!!peekPanel); rootEl.classList.toggle("peekfull",!!peekPanel&&(full||!HALF.has(peekPanel)));
+  closeDockMenu(); renderDock();
+  if(!peekPanel) return;
+  const pn=document.querySelector(`.panel[data-panel="${peekPanel}"]`);
+  setPanel(peekPanel,true,false); pn.classList.add("peek"); if(full||!HALF.has(peekPanel)) pn.classList.add("full");
+  $("pb-"+peekPanel).scrollTop=0;
+  if(HALF.has(peekPanel)&&!full) requestAnimationFrame(()=>{ const g=$("grid").getBoundingClientRect(); if(g.top<0||g.top>innerHeight*.3) window.scrollTo({top:Math.max(0,scrollY+g.top-8),behavior:reduceMotion()?"auto":"smooth"}); });
+}
+const sheetClose=()=>setPeek(null);
+function renderDock(){ document.querySelectorAll("[data-dock]").forEach(b=>{ const id=b.dataset.dock, on=id==="more"?(!!peekPanel&&!HALF.has(peekPanel)&&peekPanel!=="text")||!$("dockMenu").hidden:peekPanel===id; b.setAttribute("aria-pressed",String(on)); }); }
+function closeDockMenu(){ const m=$("dockMenu"); if(m&&!m.hidden){ m.hidden=true; } }
+document.addEventListener("click",e=>{
+  const c=e.target.closest("[data-sheetclose]"); if(c){ sheetClose(); return; }
+  const d=e.target.closest("[data-dock]");
+  if(d){ const id=d.dataset.dock;
+    if(id==="more"){ const m=$("dockMenu"); if(m.hidden){ m.hidden=false; renderDock(); } else { m.hidden=true; renderDock(); } return; }
+    setPeek(peekPanel===id?null:id); return; }
+  const mi=e.target.closest("[data-dockgo]"); if(mi){ setPeek(mi.dataset.dockgo); return; }
+  if(!e.target.closest("#dockMenu")) { const m=$("dockMenu"); if(m&&!m.hidden){ m.hidden=true; renderDock(); } }
+});
+document.addEventListener("keydown",e=>{ if(e.key!=="Escape") return; if(!$("dockMenu").hidden){ $("dockMenu").hidden=true; renderDock(); return; }
+  if(peekPanel&&!document.querySelector(".modal:not([hidden]),.helpview:not([hidden])")) sheetClose(); });
+NARROW.addEventListener("change",m=>{ if(!m.matches&&peekPanel) setPeek(null); });
+/* 標題列拖曳：往上拉成全高、往下拉收起 */
+(function(){ let st=null;
+  document.addEventListener("pointerdown",e=>{ const h=e.target.closest(".panel.peek>h2"); if(!h||e.target.closest("button:not(.ptog)")) return; st={y:e.clientY,id:e.pointerId,pn:h.parentElement,moved:false}; },{passive:true});
+  document.addEventListener("pointermove",e=>{ if(!st||e.pointerId!==st.id) return; const dy=e.clientY-st.y; if(Math.abs(dy)>6) st.moved=true; if(st.moved) st.pn.style.transform=dy>0?`translateY(${dy}px)`:""; });
+  const end=e=>{ if(!st||e.pointerId!==st.id) return; const dy=e.clientY-st.y, pn=st.pn; pn.style.transform="";
+    if(st.moved){ if(dy>70) sheetClose(); else if(dy<-50&&!pn.classList.contains("full")) setPeek(peekPanel,true); }
+    const moved=st.moved; st=null; if(moved){ const kill=ev=>{ ev.stopPropagation(); ev.preventDefault(); }; document.addEventListener("click",kill,{capture:true,once:true}); setTimeout(()=>document.removeEventListener("click",kill,{capture:true}),50); } };
+  document.addEventListener("pointerup",end); document.addEventListener("pointercancel",end);
+})();
 function fitTopbar(){
   const tb=$("topbar"), nav=tb.querySelector(".monthnav"), name=tb.querySelector(".appname");
   const nr=nav.getBoundingClientRect(), wr=name.getBoundingClientRect(), tr=tb.getBoundingClientRect();
@@ -2085,7 +2208,7 @@ function fitTopbar(){
   document.documentElement.style.setProperty("--toph",(tb.offsetHeight-off+8)+"px");
 }
 window.addEventListener("resize",fitTopbar); if(window.ResizeObserver) new ResizeObserver(fitTopbar).observe($("topbar"));
-function openPanel(id,scroll){ setPanel(id,true,true); if(scroll){ const pn=document.querySelector(`.panel[data-panel="${id}"]`); if(pn) pn.scrollIntoView({behavior:"smooth",block:"start"}); } }
+function openPanel(id,scroll){ if(NARROW.matches){ setPeek(id); return; } setPanel(id,true,true); if(scroll){ const pn=document.querySelector(`.panel[data-panel="${id}"]`); if(pn) pn.scrollIntoView({behavior:"smooth",block:"start"}); } }
 document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("[data-openpanel]"); if(b) openPanel(b.dataset.openpanel,true); });
 /* 收起時的摘要 */
 function renderPanelSums(md){
@@ -3156,7 +3279,7 @@ const DEMOS={
       return o;
     }},
   part:{who:"小安",name:"兼職打工",look:{showObs:true,showTitle:false,fileName:"打工班表",titleStyle:"text",titleTpl:"〔中文月份〕打工表 〔年份〕",layout:{tag:"l"}},title:"小安的打工戰記",
-    desc:"大學生，平日一三五晚上和週六打工；週六是 10-14 和 18-22 兩段班，示範一天放兩個標籤（點日期前先開啟「疊加」）。上課、考試和私人行程設成隱藏：自己編輯時看得到半透明的提示，產生的圖片不會出現；要讓店長知道的「請假」用空心顯示。隱藏的標籤還另外取了顯示名稱，編輯時看得到。",
+    desc:"大學生，平日一三五晚上和週六打工；週六是 10-14 和 18-22 兩段班，示範一天放兩個標籤（點日期前先開啟「追加」）。上課、考試和私人行程設成隱藏：自己編輯時看得到半透明的提示，產生的圖片不會出現；要讓店長知道的「請假」用空心顯示。隱藏的標籤還另外取了顯示名稱，編輯時看得到。",
     disp:{"上課":"修行","考試":"決戰","約會":"密會","女友生日":"女神降臨","紀念日":"締約之日","生日":"覺醒日"},
     colors:{"休假":"#2b8a6e","18-22":"#d9822b","10-14":"#12908e","上課":"#5c6b7d","考試":"#c0392b","請假":"#d1477a","約會":"#d1477a","女友生日":"#d1477a","紀念日":"#d1477a","生日":"#d1477a"},
     labels:[{name:"休假",type:"off",style:"hidden"},{name:"18-22",type:"work",style:"solid"},{name:"10-14",type:"work",style:"solid"},{name:"上課",type:"off",style:"hidden"}],def:"休假",

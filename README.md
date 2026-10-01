@@ -5,7 +5,7 @@
 **👉 開始使用：https://roster.chika.cc/**
 
 <p align="center">
-  <img src="docs/screenshot-desktop.png" alt="桌機畫面：2026 年 10 月班表，早班、晚班、夜班顯示成「早」「晚」「夜」，有幾天同時排早班和家教，國慶日和補假的日期是紅字並標出節日名稱，特休用空心標籤">
+  <img src="docs/screenshot-desktop.png" alt="桌機畫面：左邊是 2026 年 10 月班表、右邊是標籤設定。班表裡早班、晚班、夜班顯示成「早」「晚」「夜」，有幾天同時排早班和家教，國慶日和補假的日期是紅字並標出節日名稱，特休用空心標籤">
 </p>
 <p align="center">
   <img src="docs/screenshot-mobile.png" alt="手機畫面（淺色）：同一個月在窄螢幕上的樣子" width="300">
