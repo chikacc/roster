@@ -415,13 +415,15 @@ kbd{font-family:var(--f-num);font-size:.8rem;border:1px solid var(--line);border
 .legend{display:flex;gap:8px;flex-wrap:wrap;font-size:clamp(.8rem,1.5cqi,1.15rem)}
 .legend>span{display:inline-flex;align-items:center;padding:.1em .55em;border-radius:6px;font-weight:800;background:var(--c);color:var(--t);border:2px solid var(--cb,var(--c))}
 /* 有顯示名稱的圖例：左段顯示名稱（實心）、右段原本的名稱（淡色底） */
-.legend>span.lgp{padding:0;overflow:hidden;background:transparent}
+/* 外框和裡面兩段分開畫，縮放到非整數倍時邊線會粗細不一、裡面的底色和外框之間露出白縫；
+   所以外層底色直接用框線的顏色，縫隙就跟框線同色，看起來是一條完整的框 */
+.legend>span.lgp{padding:0;overflow:hidden;background:var(--cb,var(--c))}
 .lgp .la{padding:.1em .5em;background:var(--c);color:var(--t)}
 /* 淡色底不用 color-mix：產生圖片的程式庫不支援，改用半透明的底層 */
-.lgp .lb{padding:.1em .5em;color:var(--fg);font-weight:700;position:relative;z-index:0}
-.lgp .lb::before{content:"";position:absolute;inset:0;background:var(--c);opacity:.14;z-index:-1}
-.legend>span.lgp.outline .la{background:transparent;color:var(--tcx,var(--tc,var(--c)))}
-.legend>span.lgp.hidshow{border-style:dashed}
+.lgp .lb{padding:.1em .5em;color:var(--fg);font-weight:700;position:relative;z-index:0;background:var(--sheet);border-radius:0 4px 4px 0;align-self:stretch;display:flex;align-items:center}
+.lgp .lb::before{content:"";position:absolute;inset:0;border-radius:inherit;background:var(--c);opacity:.14;z-index:-1}
+.legend>span.lgp.outline .la{background:var(--sheet);border-radius:4px 0 0 4px;align-self:stretch;display:flex;align-items:center;color:var(--tcx,var(--tc,var(--c)))}
+.legend>span.lgp.hidshow{border-style:dashed;background:transparent}
 .lgp.hidshow .la{background:transparent;color:var(--tcx,var(--tc,var(--c)))}
 
 .grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:clamp(4px,.8cqi,9px)}
@@ -1185,7 +1187,7 @@ a,.linkbtn{white-space:nowrap}
 <script src="vendor/html2canvas.min.js"></script>
 <script>
 const APP="班表", UNTITLED="未命名班表", FILE_DEFAULT="roster";
-const VERSION="1.5.2";
+const VERSION="1.5.3";
 const ICON={
   tag:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>',
   grid:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10M15 10v10"/></svg>',
@@ -4013,7 +4015,7 @@ const DEMO_EGGS={
          {t:"生日 12/8 跟同事換成白班，晚上可以慶祝。",f:c=>c.m===12},
          {t:"醫院的班表習慣用英文縮寫，星期也寫成 S M T。"}],
   night:[{t:"跨年夜開到早上 6 點（20-30），元旦公休。",f:c=>c.m===12},
-         {t:"把國外帶回來的節日辦成店裡的活動：1/25 彭斯之夜（Burns Night）、4/1 愚人節（April Fools）、7/25 盛夏聖誕（Xmas in July）、10/3 無酒精之夜（0% Night）。發到社群的圖片只寫活動名稱；客人當面問今天是什麼日子，他都回答「我生日」。四次都不算說謊。",f:c=>!!fakeBday(c)},
+         {t:"把國外帶回來的節日辦成店裡的活動：1/25 彭斯之夜（Burns Night）、4/1 愚人節（April Fools）、7/25 盛夏聖誕（Xmas in July）、10/3 無酒精之夜（0% Night）。發到社群的圖片只寫活動名稱；客人當面問今天是什麼日子，他都回答「我生日」。四次都不算說謊。",a:"demo-kai",f:c=>!!fakeBday(c)},
          {t:"真正的生日是 2/29，四年才一次，只有高中同學知道（隱藏的「Birthday」）；那天照常上班、隔天休息。",f:c=>c.m===2&&c.n===29},
          {t:"班表就是店的營業日曆：公休是隱藏的預設，有寫營業時間的日子才有開。店走國外的風格，班表一律用英文，月份也只寫英文；班是自己排的，所以不放統計。國定假日照常營業，國定假日和補班日都不顯示。"}]
 };
@@ -4028,7 +4030,8 @@ function eggHTML(id){
   const [cy,cm]=ym();
   return `<ul>${(DEMO_EGGS[id]||[]).map(e=>{ const at=e.f?eggNext(id,e.f):null;   // 沒有 f：個性設定，不用跳月份
     const go=at?(at[0]===cy&&at[1]===cm?`<span class="muted">（就是這個月）</span>`:` <button class="linkbtn" type="button" data-egggo="${at[0]}-${at[1]}">看 ${at[0]} 年 ${at[1]} 月</button>`):"";
-    return `<li>${esc(e.t)}${go}</li>`; }).join("")}</ul><a href="help.html#demo" target="_blank" rel="noopener">查看範例的所有規則 →</a>`;
+    const more=e.a?` <a href="help.html#${e.a}" target="_blank" rel="noopener">為什麼？</a>`:"";
+    return `<li>${esc(e.t)}${more}${go}</li>`; }).join("")}</ul><a href="help.html#demo" target="_blank" rel="noopener">查看範例的所有規則 →</a>`;
 }
 $("eggBtn").onclick=()=>{ if(!demo) return; demo.eggOpen=!demo.eggOpen; renderDemoBar(); };
 $("eggAns").addEventListener("click",e=>{ const b=e.target.closest("[data-egggo]"); if(!b) return; const [y,m]=b.dataset.egggo.split("-").map(Number); gotoMonth(y,m); });
