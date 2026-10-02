@@ -58,6 +58,7 @@ body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15
   padding:7px 13px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
 a.btn{text-decoration:none}
 .btn.primary{background:var(--btn);color:var(--btn-fg)}
+#demoBtn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
 .btn.quiet{border-color:var(--line)}
 .btn.plan{background:var(--accent-bg);border-color:var(--accent);color:var(--accent);font-weight:700}
 .btn:disabled{opacity:.45;cursor:not-allowed}
@@ -117,7 +118,7 @@ a.btn{text-decoration:none}
   .brush.clear,.brush.stacktog,#exportBtn{flex:none;padding-inline:9px}
   .brush.clear,.brush.stacktog,.brushbar>#exportBtn{min-height:calc(.92rem * 1.5 + 14px);justify-content:center}
   .brushbar{align-items:flex-end}
-  #helpBtn .lbl{display:none}
+  #helpBtn .lbl,#demoBtn .lbl{display:none}
   .demochip .dl{display:none}
 }
 .brushes{display:flex;flex-wrap:wrap;gap:6px;align-items:center;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
@@ -314,10 +315,9 @@ kbd{font-family:var(--f-num);font-size:.8rem;border:1px solid var(--line);border
 .eggans li{margin:2px 0}
 .eggans a{color:var(--accent);font-weight:700}
 /* 範例中：畫面外框＋工具列上的「範例中・離開」（都不會出現在產生的圖片） */
-:root.in-demo{background:var(--accent)}
-:root.in-demo body{margin:6px;border-radius:16px;min-height:calc(100dvh - 12px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))}
+:root.in-demo .wrap{outline:3px solid var(--accent);outline-offset:10px;border-radius:14px}
 .demochip{position:sticky;left:0;z-index:2;flex:none;background:var(--accent);color:#fff;border:none;border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;font-weight:800;cursor:pointer}
-@media print{:root.in-demo{background:none}:root.in-demo body{margin:0}.demochip{display:none}}
+@media print{:root.in-demo .wrap{outline:none}.demochip{display:none}}
 #backupLock{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .demopick .btn{padding:5px 11px;font-size:.85rem;border-color:var(--accent);background:var(--sheet)}
 .demopick .btn[aria-pressed="true"]{background:var(--btn);color:var(--btn-fg);border-color:var(--btn)}
@@ -465,6 +465,21 @@ kbd{font-family:var(--f-num);font-size:.8rem;border:1px solid var(--line);border
   .cell:not(.mc) .tag.stack .te{font-size:.62em;line-height:1.1;font-weight:800}
   .grid.has-split .cell:not(.mc) .tags{--th:calc(1.9em + 4px)}
 }
+/* 時間的寫法：一行＝窄格子也不拆；兩行＝寬格子也拆（放 2 個以上的格子維持一行） */
+.grid.tf-one .cell .tag.stack .tn{display:inline!important;flex-direction:row}
+.grid.tf-one .cell .tag.stack .te{font-size:1em!important;font-weight:inherit!important}
+.grid.tf-two .cell:not(.mc) .tag.stack .tw{display:none}
+.grid.tf-two .cell:not(.mc) .tag.stack .tn{display:flex;flex-direction:column;align-items:center;line-height:1}
+.grid.tf-two .cell:not(.mc) .tag.stack .te{font-size:.62em;line-height:1.1;font-weight:800}
+.grid.tf-two.has-split .cell:not(.mc) .tags{--th:calc(1.9em + 4px)}
+.grid.tf-two .cell.mc .tags{font-size:min(calc(92cqi / var(--lenM) * var(--tw,1)), calc(max(36cqi, 1.15rem) * var(--ts,1)))}
+/* 只擠那幾天：這一格的標籤區照它自己的標籤數分行，字縮小（窄格子本來就用一行的小字，不用再縮） */
+@container (min-width: 64.01px){
+  .cell.sq .tags{--th:calc((1.32em + 4px) * var(--sqk,.6));--tagh:var(--th)}
+  .cell.sq[style*="--rows:3"] .tags{--sqk:.42}
+  .cell.sq .tag{font-size:calc(1em * var(--sqk,.6));height:100%!important;min-height:0;align-self:stretch}
+  .cell.sq[style*="--rows:3"] .tag{font-size:.42em}
+}
 .overnote{margin-top:6px;font-size:clamp(.78rem,1.3cqi,1.05rem);color:var(--muted)}
 .foot{margin-top:12px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:clamp(.8rem,1.4cqi,1.1rem);color:var(--muted)}
 .foot b{color:var(--fg);font-family:var(--f-num)}
@@ -524,7 +539,8 @@ kbd{font-family:var(--f-num);font-size:.8rem;border:1px solid var(--line);border
   .maincol>*{flex-shrink:0}
   /* 月曆跟著捲動固定在上方；寬度依畫面高度限制，6 列的月份也整張放得下 */
   .maincol>.sheet{position:sticky;top:calc(var(--toph,0px) + 12px)}
-  :root:not(.exporting) .maincol>.sheet{width:100%;max-width:max(560px,calc((100vh - var(--toph,0px) - 250px) * 1.46 + 60px));margin-inline:auto}
+  .maincol>.sheet{width:100%;margin-inline:auto}
+  .maincol>.sheet.scrolly{max-height:var(--fitH);overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--sb) transparent}
   .sidecol .panels{grid-template-columns:1fr}
   .dock{display:none!important}
 }
@@ -699,6 +715,7 @@ input[type="text"]{font:inherit;font-family:var(--f-num);font-size:.95rem;width:
         </div>
       </div>
     <div class="headr">
+    <button class="btn quiet" id="demoBtn" type="button" aria-pressed="false" title="看範例：六種工作型態的班表" data-icon="eye"><span class="lbl">範例</span></button>
     <a class="btn quiet" id="helpBtn" href="help.html" target="_blank" rel="noopener" data-icon="help"><span class="lbl">說明</span></a>
     <div class="seg" role="group" aria-label="顯示主題">
       <button class="btn icon-btn" type="button" data-theme-opt="light" aria-pressed="false" aria-label="淺色" title="淺色" data-icon="sun"></button>
@@ -908,7 +925,7 @@ input[type="text"]{font:inherit;font-family:var(--f-num);font-size:.95rem;width:
       <h2>標籤設定（這個月） <button class="info" type="button" data-info="labels" aria-label="標籤設定的說明"></button></h2>
       <p>每個月各自一份，新的月份沿用上個月。</p>
       <div class="labs" id="labs"></div>
-      <div class="actions"><button class="btn" id="addLabel" type="button">新增標籤</button><button class="btn quiet" id="openDemo" type="button">看範例</button></div>
+      <div class="actions"><button class="btn" id="addLabel" type="button">新增標籤</button><button class="btn quiet" id="openDemo" type="button" hidden>看範例</button></div>
     </div>
     <div class="panel">
       <h2>版面</h2>
@@ -940,8 +957,15 @@ input[type="text"]{font:inherit;font-family:var(--f-num);font-size:.95rem;width:
           <p class="grouphead">月曆的樣子</p>
           <div class="xrow"><span>每格顯示幾個標籤 <button class="info" type="button" data-info="rows" aria-label="每格顯示幾個標籤的說明"></button></span>
             <div class="seg" role="group" aria-label="每格顯示幾個標籤"><button class="btn" type="button" data-lay="rows" data-v="auto">自動</button><button class="btn" type="button" data-lay="rows" data-v="1">1</button><button class="btn" type="button" data-lay="rows" data-v="2">2</button><button class="btn" type="button" data-lay="rows" data-v="3">3</button></div></div>
+          <div class="xrow"><span>一天有好幾個標籤時 <button class="info" type="button" data-info="multi" aria-label="一天有好幾個標籤時的說明"></button></span>
+            <div class="seg" role="group"><button class="btn" type="button" data-lay="multi" data-v="auto">自動</button><button class="btn" type="button" data-lay="multi" data-v="squeeze">只擠那幾天</button><button class="btn" type="button" data-lay="multi" data-v="split">整個月分行</button></div></div>
+          <p class="xhint" id="multiNeed" hidden>「每格顯示幾個標籤」選「自動」時才有作用。</p>
           <div class="xrow"><span>標籤大小 <button class="info" type="button" data-info="tagsize" aria-label="標籤大小的說明"></button></span>
             <div class="seg" role="group" aria-label="標籤大小"><button class="btn" type="button" data-lay="tag" data-v="s">小</button><button class="btn" type="button" data-lay="tag" data-v="m">中</button><button class="btn" type="button" data-lay="tag" data-v="l">大</button></div></div>
+          <div class="xrow"><span>週數 <button class="info" type="button" data-info="weeks" aria-label="週數的說明"></button></span>
+            <div class="seg" role="group"><button class="btn" type="button" data-lay="weeks" data-v="auto">隨月份</button><button class="btn" type="button" data-lay="weeks" data-v="6">固定 6 週</button></div></div>
+          <div class="xrow"><span>時間的寫法 <button class="info" type="button" data-info="timefmt" aria-label="時間的寫法的說明"></button></span>
+            <div class="seg" role="group"><button class="btn" type="button" data-lay="timeFmt" data-v="auto">自動</button><button class="btn" type="button" data-lay="timeFmt" data-v="one">一行</button><button class="btn" type="button" data-lay="timeFmt" data-v="two">兩行</button></div></div>
           <div class="xrow"><span>日期大小</span>
             <div class="seg" role="group" aria-label="日期大小"><button class="btn" type="button" data-lay="date" data-v="s">小</button><button class="btn" type="button" data-lay="date" data-v="m">中</button><button class="btn" type="button" data-lay="date" data-v="l">大</button></div></div>
           <div class="xrow"><span>顯示名稱 <button class="info" type="button" data-info="dispMode" aria-label="顯示名稱的說明"></button></span>
@@ -1006,7 +1030,7 @@ input[type="text"]{font:inherit;font-family:var(--f-num);font-size:.95rem;width:
 <script src="vendor/html2canvas.min.js"></script>
 <script>
 const APP="班表", UNTITLED="未命名班表", FILE_DEFAULT="roster";
-const VERSION="1.2.0";
+const VERSION="1.3.0";
 const ICON={
   tag:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>',
   grid:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10M15 10v10"/></svg>',
@@ -1078,7 +1102,7 @@ let draft=null;
 const today=()=>window.__TODAY?new Date(window.__TODAY):new Date();
 const keyOf=(y,m)=>`${y}-${String(m).padStart(2,"0")}`;
 const curKey=()=>{const t=today();return keyOf(t.getFullYear(),t.getMonth()+1);};
-const LAYOUT_DEFAULT=()=>({rows:"auto",tag:"m",date:"m",fill:"some",solo:"match",dispMode:"always",adj:false,join:false,joinMonth:false,cell:"border"});
+const LAYOUT_DEFAULT=()=>({rows:"auto",tag:"m",date:"m",fill:"some",solo:"match",dispMode:"always",adj:false,join:false,joinMonth:false,cell:"border",multi:"auto",timeFmt:"auto",weeks:"auto"});
 const ICS_DEFAULT=()=>({range:"month",pick:{},prefix:false});
 function defaults(){return {v:3,guideDismissed:false,title:"",fileName:"",exportDark:false,exportShape:"wide",exportRes:"default",exportWidth:2000,showTitle:false,titleAutoDone:false,
   showHours:true,showOverflow:true,showHolidays:true,holNames:true,showMakeup:true,showObs:false,hiddenMode:"edit",theme:"system",weekStart:0,stampExport:true,stack:false,
@@ -1259,9 +1283,16 @@ const SIZE={s:.82,m:1,l:1.22};
 /* 每格顯示幾個：「自動」＝這個月同一天最多有幾個會顯示的標籤（1–3） */
 let ROWS=1;
 const shownCount=(md,d)=>effList(md,d).filter(x=>isShownMode(tagMode(md,x))).length;
+/* SQ：「只擠那幾天」——整個月照一個標籤排，標籤比較多的日子在自己的格子裡擠（最多 CAP 個） */
+let SQ=false, CAP=1;
 function effRows(md){
+  SQ=false; CAP=1;
   const r=S.layout.rows; if(r!=="auto") return +r||1;
-  const [y,m]=ym(), n=daysIn(y,m); let mx=1; for(let d=1;d<=n;d++) mx=Math.max(mx,shownCount(md,d)); return Math.min(3,mx);
+  const [y,m]=ym(), n=daysIn(y,m); let mx=1, multi=0;
+  for(let d=1;d<=n;d++){ const c=shownCount(md,d); mx=Math.max(mx,c); if(c>=2) multi++; }
+  mx=Math.min(3,mx); const mode=S.layout.multi||"auto";
+  if(mx>1&&(mode==="squeeze"||(mode==="auto"&&multi<=3))){ SQ=true; CAP=mx; return 1; }
+  return mx;
 }
 /* 這一格是否放了 2 個以上會顯示的標籤（半透明預覽不算，免得編輯時和圖片的版面不同） */
 const isMultiCell=p=>p.slots.filter(s=>s[1]!=="ghost").length>=2;
@@ -1271,13 +1302,15 @@ function applyLens(md){
   const F={s:3.6,m:3,l:2.4}[S.layout.tag]||3, FN=F*.45;
   let len=F, lenN=FN, lenM=FN, split=false;
   /* 看這個月「有設定」的標籤（隱藏的不算），不管這個月有沒有用到：清掉某一天、或剛好沒排到某個班，字的大小都不會變 */
-  md.labels.filter(visible).forEach(l=>{ const n=l.name, t=narrowText(n);
-    len=Math.max(len,wlen(wideText(n))); lenM=Math.max(lenM,wlen(t)); lenN=Math.max(lenN,stackLen(t)); if(stackParts(t)) split=true; });
+  const tf=S.layout.timeFmt||"auto";
+  md.labels.filter(visible).forEach(l=>{ const n=l.name, t=narrowText(n), w=wideText(n);
+    len=Math.max(len,tf==="two"&&stackParts(t)?stackLen(t):wlen(w)); lenM=Math.max(lenM,wlen(t)); lenN=Math.max(lenN,tf==="one"?wlen(t):stackLen(t)); if(stackParts(t)&&tf!=="one") split=true; });
   ROWS=effRows(md);
   const g=$("grid"), L=S.layout;
   g.style.setProperty("--len",len.toFixed(2)); g.style.setProperty("--lenN",lenN.toFixed(2)); g.style.setProperty("--lenM",lenM.toFixed(2)); g.classList.toggle("has-split",split);
   ROWS=effRows(md); g.style.setProperty("--rows",ROWS); g.classList.toggle("multi",ROWS>=2); g.style.setProperty("--ts",SIZE[L.tag]||1); g.style.setProperty("--tw",Math.min(1,SIZE[L.tag]||1)); g.style.setProperty("--ds",SIZE[L.date]||1);
   ["none","some","full"].forEach(v=>g.classList.toggle("f-"+v,(L.fill||"some")===v));
+  ["one","two"].forEach(v=>g.classList.toggle("tf-"+v,(L.timeFmt||"auto")===v));
   g.classList.toggle("solo-top",L.solo==="top");
   ["border","tint","none"].forEach(v=>g.classList.toggle("cs-"+v,(L.cell||"border")===v));
 }
@@ -1295,7 +1328,7 @@ function tagMode(md,name){
 const isShownMode=k=>k==="show"||k==="outline"||k==="hidshow";
 /* 一格要放的標籤：會顯示的標籤最多放「每格顯示幾個」，其餘算超出；半透明的隱藏標籤只用剩下的空位，不算超出 */
 function cellParts(md,d){
-  const list=effSorted(md,d), rows=ROWS;
+  const list=effSorted(md,d), rows=SQ?CAP:ROWS;
   const shown=list.filter(n=>isShownMode(tagMode(md,n)));
   const ghosts=list.filter(n=>tagMode(md,n)==="ghost");
   /* 看得到的標籤優先佔位，半透明預覽只用剩下的空位；放進格子後照正常順序（整天在前，其他照開始時間）排列 */
@@ -1406,7 +1439,7 @@ function updateCell(d){
   const more=btn.querySelector(".more"); more.hidden=!p.over.length; more.textContent="+"+p.over.length;
   const [y,m]=ym(); btn.setAttribute("aria-label",cellLabelText(md,d,m,new Date(y,m-1,d).getDay(),p.list));
   const t=cellTitle(d,p); if(t) btn.title=t; else btn.removeAttribute("title");
-  btn.classList.toggle("mc",isMultiCell(p));
+  btn.classList.toggle("mc",isMultiCell(p)); const sq=SQ&&p.slots.length>1; btn.classList.toggle("sq",sq); if(sq) btn.style.setProperty("--rows",p.slots.length); else btn.style.removeProperty("--rows");
   applyLens(md); applyJoin(md); renderOverNote(md);
 }
 /* 前後月份的日期（版面的選項，預設關閉）：淡色日期；那個月排過班才半透明顯示標籤；點了切到那個月 */
@@ -1520,7 +1553,57 @@ function renderBrushes(){
     old.forEach(o=>{ if(!now.has(o.n)) ghostOut(o.b,"brush",o.r); }); }
   blistEdges(); const sel=document.querySelector("#blist .brush[aria-pressed=\"true\"]"); if(sel) scrollBrushIntoView(sel);
 }
-function render(opt={}){
+/* ---------- 頁面捲動 ----------
+   重畫月曆不應該讓頁面跳動（iPhone Safari 會在重畫時把頁面捲回頂端）：重畫前記下位置，之後一小段時間內，
+   不是使用者自己捲、也不是程式刻意捲的跳動，都捲回原位。 */
+let scrollIntent=0, userScrollAt=0, guardY=null, guardUntil=0;
+const intendScroll=()=>{ scrollIntent=performance.now(); };
+["wheel","keydown"].forEach(t=>addEventListener(t,()=>{ userScrollAt=performance.now(); },{passive:true,capture:true}));
+addEventListener("touchmove",()=>{ if(!paint) userScrollAt=performance.now(); },{passive:true,capture:true});
+function guardScroll(y){
+  guardY=y; guardUntil=performance.now()+600;
+  if(Math.abs(scrollY-y)>2&&performance.now()-scrollIntent>800) window.scrollTo(0,y);
+}
+addEventListener("scroll",()=>{ const t=performance.now();
+  if(guardY==null||t>guardUntil){ guardY=null; return; }
+  if(t-userScrollAt<400||t-scrollIntent<800){ guardY=null; return; }
+  if(Math.abs(scrollY-guardY)>40) window.scrollTo(0,guardY); },{passive:true});
+/* 調整設定時，受影響的地方不在畫面上（被上方固定列、下方面板擋住或捲出去）才平滑捲過去 */
+function revealEl(el){
+  if(!el||!el.getClientRects().length) return;
+  const tb=$("topbar"), tbs=getComputedStyle(tb).position==="sticky";
+  const top=tbs?Math.max(0,tb.getBoundingClientRect().bottom):0;
+  const pk=document.querySelector(".panel.peek"), dk=$("dock");
+  const bottom=pk?pk.getBoundingClientRect().top:(dk&&dk.offsetParent?dk.getBoundingClientRect().top:innerHeight);
+  const r=el.getBoundingClientRect(); if(r.bottom>top+8&&r.top<bottom-8) return;   // 看得到一部分就不捲
+  const dy=r.top<top?r.top-top-12:Math.min(r.top-top-12,r.bottom-bottom+12);
+  intendScroll(); window.scrollTo({top:Math.max(0,scrollY+dy),behavior:reduceMotion()?"auto":"smooth"});
+}
+const REVEAL={head:["showTitle","titleStyle","showLegend","tpl"],dow:["dowStyle","weekStart"],foot:["showStats","showHours","stampExport","showOverflow"]};
+function revealFor(key){
+  if(REVEAL.head.includes(key)) revealEl($("sheet").querySelector(".head"));
+  else if(REVEAL.dow.includes(key)) revealEl($("grid").querySelector(".dow"));
+  else if(REVEAL.foot.includes(key)) revealEl(key==="showOverflow"&&!$("overNote").hidden?$("overNote"):$("sheet").querySelector(".foot"));
+}
+function revealLabel(name){ const t=[...$("grid").querySelectorAll(".cell[data-d] .tag")].find(t=>(t.dataset.sig||"").split("|")[0]===name); if(t) revealEl(t.closest(".cell")); }
+function render(opt={}){ const y=scrollY; renderInner(opt); fitSheet(); guardScroll(y); }
+/* 寬螢幕：月曆固定在左邊時，量實際高度，放不下就照比例縮窄，整張月曆一定放得進畫面；縮到最小還放不下，月曆那一欄自己捲 */
+const WIDE=window.matchMedia("(min-width:1100px)");
+function fitSheet(){
+  const sh=$("sheet"), mc=$("maincol"); if(!sh||!mc) return;
+  sh.style.maxWidth=""; sh.classList.remove("scrolly");
+  if(!WIDE.matches) return;
+  /* 頁尾在月曆欄下面；月曆底下要留得下頁尾的高度，捲到最底時月曆才不會被推上去 */
+  const lay=$("layout").getBoundingClientRect(), foot=Math.min(140,Math.max(0,rootEl.scrollHeight-(lay.bottom+scrollY)));
+  const avail=innerHeight-(parseFloat(getComputedStyle(rootEl).getPropertyValue("--toph"))||0)-24-foot, MIN=520;
+  rootEl.style.setProperty("--fitH",avail+"px");
+  for(let k=0;k<3;k++){ const h=sh.offsetHeight, w=sh.offsetWidth; if(h<=avail+1) return;
+    const nw=Math.max(MIN,Math.floor(w*avail/h)); if(nw>=w) break; sh.style.maxWidth=nw+"px"; layoutJoin($("grid"),window); }
+  if(sh.offsetHeight>avail+1) sh.classList.add("scrolly");   // 縮到最小還放不下：月曆自己捲
+}
+WIDE.addEventListener("change",fitSheet);
+let fitT=null; addEventListener("resize",()=>{ clearTimeout(fitT); fitT=setTimeout(fitSheet,120); });
+function renderInner(opt={}){
   countsRef={key:$("counts").dataset.k,vals:[...$("counts").querySelectorAll("b")].map(b=>b.textContent)};
   const [y,m]=ym(), md=monthData(false), n=daysIn(y,m), WS=S.weekStart===1?1:0;
   ensureBrush(md);   // 半透明預覽要看目前選的標籤，所以先決定好
@@ -1547,9 +1630,10 @@ function render(opt={}){
   for(let d=1;d<=n;d++){
     const wd=wdOf(d), p=cellParts(md,d), t=cellTitle(d,p), hol=holOf(y,m,d), nt=dayNote(y,m,d);
     const red=hol?hol.off:(wd===0||wd===6);
-    h+=`<button type="button" class="cell${red?" we":""}${hol?" hol":""}${isMultiCell(p)?" mc":""}" data-d="${d}" aria-label="${cellLabelText(md,d,m,wd,p.list)}"${t?` title="${esc(t)}"`:""}><span class="dh"><span class="d">${d}</span>${nt?`<span class="hname${nt.cls}">${esc(nt.text)}</span>`:""}<span class="more"${p.over.length?"":" hidden"}>+${p.over.length}</span></span><span class="tags">${(pl=>p.slots.map((sl,i)=>tagHTML(sl,pl[i])).join(""))(placeRows(p.slots))}</span></button>`;
+    h+=`<button type="button" class="cell${red?" we":""}${hol?" hol":""}${isMultiCell(p)?" mc":""}${SQ&&p.slots.length>1?" sq":""}"${SQ&&p.slots.length>1?` style="--rows:${p.slots.length}"`:""} data-d="${d}" aria-label="${cellLabelText(md,d,m,wd,p.list)}"${t?` title="${esc(t)}"`:""}><span class="dh"><span class="d">${d}</span>${nt?`<span class="hname${nt.cls}">${esc(nt.text)}</span>`:""}<span class="more"${p.over.length?"":" hidden"}>+${p.over.length}</span></span><span class="tags">${(pl=>p.slots.map((sl,i)=>tagHTML(sl,pl[i])).join(""))(placeRows(p.slots))}</span></button>`;
   }
-  if(S.layout.adj){ const trail=(7-(lead+n)%7)%7; for(let d=1;d<=trail;d++) h+=adjCell(nm[0],nm[1],d); }
+  { const six=S.layout.weeks==="6", trail=six?42-lead-n:(7-(lead+n)%7)%7;   // 固定 6 週：最後補滿 6 列
+    for(let d=1;d<=trail;d++) h+=S.layout.adj?adjCell(nm[0],nm[1],d):(six?`<div class="cell empty"></div>`:""); }
   $("grid").innerHTML=h; applyLens(md); applyJoin(md);
   renderCounts(md,n); renderOverNote(md); if(typeof renderPanelSums==="function") renderPanelSums(md); doFlash(md);
   const fmt=d=>`${m}/${d}（${DOW_ALL[wdOf(d)]}）`;
@@ -1767,11 +1851,11 @@ $("labs").addEventListener("click",e=>{
   const pick=e.target.closest("[data-pick]");
   if(pick){const name=md.labels[+pick.dataset.pick].name; openPicker=openPicker===name?null:name; renderLabs(); return;}
   const pre=e.target.closest(".preset");
-  if(pre&&openPicker){S.colors[openPicker]=pre.dataset.color; save(); render(); return;}
+  if(pre&&openPicker){S.colors[openPicker]=pre.dataset.color; save(); render(); revealLabel(openPicker); return;}
   const ty=e.target.closest("[data-type]");
   if(ty){ const mdc=monthData(true); mdc.labels[+ty.dataset.type].type=ty.dataset.v; touch(); render(); return; }
   const sty=e.target.closest("[data-style]");
-  if(sty){ const mdc=monthData(true); mdc.labels[+sty.dataset.style].style=sty.dataset.v; touch(); render(); const again=$(`lstyle${sty.dataset.style}-${sty.dataset.v}`); if(again) again.focus(); return; }
+  if(sty){ const mdc=monthData(true); mdc.labels[+sty.dataset.style].style=sty.dataset.v; touch(); render(); revealLabel(mdc.labels[+sty.dataset.style].name); const again=$(`lstyle${sty.dataset.style}-${sty.dataset.v}`); if(again) again.focus(); return; }
   const mv=e.target.closest("[data-move]");
   if(mv&&!mv.disabled){ const mdc=monthData(true), i=+mv.dataset.move, j=i+(+mv.dataset.dir);
     [mdc.labels[i],mdc.labels[j]]=[mdc.labels[j],mdc.labels[i]]; touch(); render();
@@ -1821,6 +1905,7 @@ function renderLayoutOpts(){
   $("titleNeed").hidden=!(S.showTitle&&!titleOf());
   { const md=monthData(false); $("legendWarn").hidden=!(S.showLegend===false&&md.labels.some(l=>dispOf(l.name)&&visible(l))); }
   renderTpl();
+  { const off=S.layout.rows!=="auto"; document.querySelectorAll('[data-lay="multi"]').forEach(b=>b.disabled=off); $("multiNeed").hidden=!off; }
   document.querySelectorAll('[data-opt="layout.joinMonth"]').forEach(b=>b.disabled=!S.layout.join);
   document.querySelectorAll("[data-hid]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.hid===(S.hiddenMode||"edit"))));
 }
@@ -1844,7 +1929,7 @@ const OPTS={
   "layout.join":{get:()=>S.layout.join?1:0,set:v=>{S.layout.join=!!+v;}},
   "layout.joinMonth":{get:()=>S.layout.joinMonth?1:0,set:v=>{S.layout.joinMonth=!!+v;}}
 };
-document.querySelectorAll("[data-opt]").forEach(b=>b.onclick=()=>{ const o=OPTS[b.dataset.opt]; o.set(b.dataset.v); if(o.after) o.after(); save(); render(o.full?{}:{skipLabs:true}); });
+document.querySelectorAll("[data-opt]").forEach(b=>b.onclick=()=>{ const o=OPTS[b.dataset.opt]; o.set(b.dataset.v); if(o.after) o.after(); save(); render(o.full?{}:{skipLabs:true}); revealFor(b.dataset.opt); });
 /* 標題文字：可以自由輸入，插入按鈕放進〔中文月份〕這類標記，下面即時預覽 */
 function renderTpl(){
   const [y,m]=ym(), v=S.titleTpl||"", out=titleText(v,y,m,false).trim();
@@ -1853,7 +1938,7 @@ function renderTpl(){
   $("tplIn").disabled=off; document.querySelectorAll(".tokbtn").forEach(b=>b.disabled=off);
   $("tplPrev").textContent=off?"只有數字時不需要標題文字。":`會顯示成：${out||"（空白）"}`+(!TOKEN_RE.test(v)&&out?"。沒有月份的標記，每個月都會顯示一樣的文字。":""); TOKEN_RE.lastIndex=0;
 }
-$("tplIn").addEventListener("input",e=>{ S.titleTpl=e.target.value; save(); render({skipLabs:true}); });
+$("tplIn").addEventListener("input",e=>{ S.titleTpl=e.target.value; save(); render({skipLabs:true}); revealFor("tpl"); });
 document.querySelectorAll(".tokbtn").forEach(b=>b.onclick=()=>{ const el=$("tplIn"), t=`〔${b.dataset.tok}〕`, a=el.selectionStart??el.value.length, z=el.selectionEnd??a;
   el.value=el.value.slice(0,a)+t+el.value.slice(z); el.focus(); el.setSelectionRange(a+t.length,a+t.length); S.titleTpl=el.value; save(); render({skipLabs:true}); });
 
@@ -2092,6 +2177,9 @@ const INFO={
   time:{t:"名稱像 9-18、22-6、18-26 會自動判斷時間，也可以自己填。時間用來算時數和匯出日曆；沒有時間就是整天。",a:"label-time"},
   disp:{t:"月曆上要顯示的文字，例如把「晚班 18-22」顯示成「晚」。手機的格子比較窄，短的顯示名稱會清楚很多。",a:"label-display"},
   order:{t:"順序會影響圖例和文字的排列。可以用上下箭頭調整，也可以在上方的標記工具列按住標籤拖曳。",a:"label-order"},
+  multi:{t:"「自動」：一個月裡有兩個以上標籤的日子在 3 天以內，只有那幾天在自己的格子裡擠一點（字小一點）；超過 3 天就整個月分行，同一個班對齊同一行。「只擠那幾天」：不管幾天，月曆一律照一個標籤排，格子不會因為某天多一個標籤而改變。「整個月分行」：一有就整個月分行。",a:"layout-rows"},
+  weeks:{t:"「隨月份」有幾週就排幾列。「固定 6 週」每個月都排 6 列，週數少的月份最後留空（有顯示前後月份時補上下個月的日期），所以每個月的月曆和產生的圖片大小都一樣。",a:"layout-weeks"},
+  timefmt:{t:"只有時間的標籤（例如 11-20）怎麼寫。「自動」：格子太窄時（手機）拆成上下兩行，否則一行；產生的圖片格子比較寬，一律一行。「一行」：一律寫在同一行，字跟著縮小。「兩行」：一律上下兩行，畫面和圖片都一樣，字比較大。",a:"layout-time"},
   rows:{t:"「自動」會依這個月同一天最多有幾個標籤決定（最多 3 個）。放不下的會在日期旁標示「+1」，並列在月曆下方。",a:"layout-rows"},
   dispMode:{t:"「只在格子太窄時顯示」在電腦上顯示完整名稱，手機等窄格子才換成顯示名稱；「一律顯示」在所有地方都用顯示名稱。",a:"label-display"},
   hol:{t:()=>"放假日的日期會變紅；「顯示名稱」再寫上節日名稱，「只標日期」只有紅字。補班日另外控制，顯示時寫「補班」。都只是提示，不影響標記和統計。"+holRangeText(),a:"holidays"},
@@ -2174,7 +2262,7 @@ function setPeek(id,full){
   const pn=document.querySelector(`.panel[data-panel="${peekPanel}"]`);
   setPanel(peekPanel,true,false); pn.classList.add("peek"); if(full||!HALF.has(peekPanel)) pn.classList.add("full");
   $("pb-"+peekPanel).scrollTop=0;
-  if(HALF.has(peekPanel)&&!full) requestAnimationFrame(()=>{ const g=$("grid").getBoundingClientRect(); if(g.top<0||g.top>innerHeight*.3) window.scrollTo({top:Math.max(0,scrollY+g.top-8),behavior:reduceMotion()?"auto":"smooth"}); });
+  if(HALF.has(peekPanel)&&!full) requestAnimationFrame(()=>{ intendScroll(); const g=$("grid").getBoundingClientRect(); if(g.top<0||g.top>innerHeight*.3) window.scrollTo({top:Math.max(0,scrollY+g.top-8),behavior:reduceMotion()?"auto":"smooth"}); });
 }
 const sheetClose=()=>setPeek(null);
 function renderDock(){ document.querySelectorAll("[data-dock]").forEach(b=>{ const id=b.dataset.dock, on=id==="more"?(!!peekPanel&&!HALF.has(peekPanel)&&peekPanel!=="text")||!$("dockMenu").hidden:peekPanel===id; b.setAttribute("aria-pressed",String(on)); }); }
@@ -2208,7 +2296,7 @@ function fitTopbar(){
   document.documentElement.style.setProperty("--toph",(tb.offsetHeight-off+8)+"px");
 }
 window.addEventListener("resize",fitTopbar); if(window.ResizeObserver) new ResizeObserver(fitTopbar).observe($("topbar"));
-function openPanel(id,scroll){ if(NARROW.matches){ setPeek(id); return; } setPanel(id,true,true); if(scroll){ const pn=document.querySelector(`.panel[data-panel="${id}"]`); if(pn) pn.scrollIntoView({behavior:"smooth",block:"start"}); } }
+function openPanel(id,scroll){ if(NARROW.matches){ setPeek(id); return; } setPanel(id,true,true); if(scroll) intendScroll(); if(scroll){ const pn=document.querySelector(`.panel[data-panel="${id}"]`); if(pn) pn.scrollIntoView({behavior:"smooth",block:"start"}); } }
 document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("[data-openpanel]"); if(b) openPanel(b.dataset.openpanel,true); });
 /* 收起時的摘要 */
 function renderPanelSums(md){
@@ -2730,7 +2818,7 @@ async function renderCanvas(){
   if(document.fonts&&document.fonts.ready) await document.fonts.ready;
   const th=S.exportDark?"dark":"light", shape=S.exportShape==="tall"?"tall":"wide";
   return await html2canvas($("sheet"),{scale:exportWidth()/EXPORT_CSS_W[shape],backgroundColor:EXPORT_BG[th],useCORS:true,
-    onclone:doc=>{const r=doc.documentElement; r.setAttribute("data-theme",th); r.classList.add("exporting"); r.classList.remove("in-demo"); if(shape==="tall") r.classList.add("tall");
+    onclone:doc=>{const r=doc.documentElement; r.setAttribute("data-theme",th); r.classList.add("exporting"); r.classList.remove("in-demo"); if(shape==="tall") r.classList.add("tall"); doc.getElementById("sheet").style.maxWidth=""; doc.getElementById("sheet").classList.remove("scrolly");
       applyContent(doc,CO());   // 這張圖片限定的內容設定
       /* 連起來的標籤：圖片的格子大小和畫面不同，重新量一次 */
       layoutJoin(doc.getElementById("grid"),doc.defaultView); }});
@@ -3210,7 +3298,7 @@ $("wipeYes").onclick=()=>{
   PANELS.forEach(([id])=>setPanel(id,id==="labels",false));
   $("wipeModal").hidden=true; $("restoreIn").value=""; inmsg("backupMsg"); applyTheme(); render(); fadeSheet();
   try{ localStorage.removeItem(STORE_KEY); }catch(e){}   // render 途中可能存過一次
-  window.scrollTo({top:0,behavior:reduceMotion()?"auto":"smooth"});
+  intendScroll(); window.scrollTo({top:0,behavior:reduceMotion()?"auto":"smooth"});
   notify("ok","已清除這個瀏覽器的所有資料",{action:UNDO});
 };
 
@@ -3279,11 +3367,10 @@ const DEMOS={
       return o;
     }},
   part:{who:"小安",name:"兼職打工",look:{showObs:true,showTitle:false,fileName:"打工班表",titleStyle:"text",titleTpl:"〔中文月份〕打工表 〔年份〕",layout:{tag:"l"}},title:"小安的打工戰記",
-    desc:"大學生，平日一三五晚上和週六打工；週六是 10-14 和 18-22 兩段班，示範一天放兩個標籤（點日期前先開啟「追加」）。上課、考試和私人行程設成隱藏：自己編輯時看得到半透明的提示，產生的圖片不會出現；要讓店長知道的「請假」用空心顯示。隱藏的標籤還另外取了顯示名稱，編輯時看得到。",
-    disp:{"上課":"修行","考試":"決戰","約會":"密會","女友生日":"女神降臨","紀念日":"締約之日","生日":"覺醒日"},
-    colors:{"休假":"#2b8a6e","18-22":"#d9822b","10-14":"#12908e","上課":"#5c6b7d","考試":"#c0392b","請假":"#d1477a","約會":"#d1477a","女友生日":"#d1477a","紀念日":"#d1477a","生日":"#d1477a"},
-    labels:[{name:"休假",type:"off",style:"hidden"},{name:"18-22",type:"work",style:"solid"},{name:"10-14",type:"work",style:"solid"},{name:"上課",type:"off",style:"hidden"}],def:"休假",
-    extra:[{name:"考試",type:"off",style:"hidden"},{name:"請假",type:"off",style:"outline"},{name:"約會",type:"off",style:"hidden"},{name:"女友生日",type:"off",style:"hidden"},{name:"紀念日",type:"off",style:"hidden"},{name:"生日",type:"off",style:"hidden"}],
+    desc:"大學生，平日一三五晚上和週六打工；週六是 10-14 和 18-22 兩段班，示範一天放兩個標籤（點日期前先開啟「追加」）。上課、考試、休假和私人行程設成隱藏：自己編輯時看得到半透明的提示，產生的圖片不會出現；要讓店長知道的「請假」用空心顯示。隱藏的標籤都取了中二的名字（休假叫「回復」、上課叫「修行」……），反正圖片上看不到。",
+    colors:{"回復":"#2b8a6e","18-22":"#d9822b","10-14":"#12908e","修行":"#5c6b7d","決戰":"#c0392b","請假":"#d1477a","密會":"#d1477a","女神降臨":"#d1477a","締約之日":"#d1477a","覺醒日":"#d1477a"},
+    labels:[{name:"回復",type:"off",style:"hidden"},{name:"18-22",type:"work",style:"solid"},{name:"10-14",type:"work",style:"solid"},{name:"修行",type:"off",style:"hidden"}],def:"回復",
+    extra:[{name:"決戰",type:"off",style:"hidden"},{name:"請假",type:"off",style:"outline"},{name:"密會",type:"off",style:"hidden"},{name:"女神降臨",type:"off",style:"hidden"},{name:"締約之日",type:"off",style:"hidden"},{name:"覺醒日",type:"off",style:"hidden"}],
     days(c){
       const o={}, summer=c.m===7||c.m===8, SH=["18-22","10-14"];
       const shifts=d=>[].concat(o[d]||[]).filter(x=>SH.includes(x)), others=d=>[].concat(o[d]||[]).filter(x=>!SH.includes(x));
@@ -3292,24 +3379,24 @@ const DEMOS={
         else if(w===1||w===3||w===5) o[d]=["18-22"]; else if(w===6) o[d]=["10-14","18-22"]; }
       /* 每月不同：偶爾把週三的班換到週四 */
       if(!summer&&c.rnd()<.5){ const ws=Object.keys(o).map(Number).filter(d=>c.wd(d)===3&&d<c.n); if(ws.length){ const d=c.pick(ws); delete o[d]; o[d+1]=["18-22"]; } }
-      /* 期末考週（1 月、6 月）：平日標「考試」不排班，考完的週六請假放鬆 */
+      /* 期末考週（1 月、6 月）：平日標「決戰」（考試）不排班，考完的週六請假放鬆 */
       const ex=examWeek(c);
       if(ex){ for(let d=ex[0];d<=ex[0]+6;d++){ if(d<1||d>c.n) continue; const w=c.wd(d);
-        if(w>=1&&w<=5){ delete o[d]; if(!c.isOff(d)) c.add(o,d,"考試"); } else if(w===6) o[d]=["請假"]; else delete o[d]; } }
+        if(w>=1&&w<=5){ delete o[d]; if(!c.isOff(d)) c.add(o,d,"決戰"); } else if(w===6) o[d]=["請假"]; else delete o[d]; } }
       /* 上課：學期中的週一到週四（寒暑假、國定假日、考試週沒有課） */
       const exE=ex?ex[0]+6:0;
       for(let d=1;d<=c.n;d++){ const w=c.wd(d);
         const term=!summer&&!(c.m===1&&d>exE)&&!(c.m===2&&d<16)&&!(c.m===6&&d>exE)&&!(c.m===9&&d<8);
-        if(term&&w>=1&&w<=4&&!c.isOff(d)&&!(ex&&d>=ex[0]&&d<=exE)) c.add(o,d,"上課"); }
+        if(term&&w>=1&&w<=4&&!c.isOff(d)&&!(ex&&d>=ex[0]&&d<=exE)) c.add(o,d,"修行"); }
       /* 女朋友（小美）：情人節、七夕、她的生日 5/20 有班就請假 */
       const leave=(d,tag)=>{ if(d<1||d>c.n) return; if(shifts(d).length) o[d]=[...others(d),"請假"]; c.add(o,d,tag); };
-      if(c.m===2) leave(14,"約會");
-      for(let d=1;d<=c.n;d++) if(c.lunar(d)==="7-7") leave(d,"約會");
-      if(c.m===5) leave(20,"女友生日");
+      if(c.m===2) leave(14,"密會");
+      for(let d=1;d<=c.n;d++) if(c.lunar(d)==="7-7") leave(d,"密會");
+      if(c.m===5) leave(20,"女神降臨");
       /* 交往紀念日 3/27：跟同事換班，把班換到隔天 */
-      if(c.m===3){ const sh=shifts(27); if(sh.length&&28<=c.n){ o[27]=others(27); o[28]=[...new Set([...others(28),...shifts(28),...sh])]; } c.add(o,27,"紀念日"); }
+      if(c.m===3){ const sh=shifts(27); if(sh.length&&28<=c.n){ o[27]=others(27); o[28]=[...new Set([...others(28),...shifts(28),...sh])]; } c.add(o,27,"締約之日"); }
       /* 自己的生日 9/21：照常上班，下班再慶祝 */
-      if(c.m===9) c.add(o,21,"生日");
+      if(c.m===9) c.add(o,21,"覺醒日");
       /* 換季容易感冒：11 月挑一天平日的晚班請病假（每年不同天） */
       if(c.m===11){ const ds=Object.keys(o).map(Number).filter(d=>{ const w=c.wd(d); return w>=1&&w<=5&&shifts(d).includes("18-22"); }); if(ds.length){ const d=c.pick(ds); o[d]=[...others(d),"請假"]; } }
       for(const d in o) if(!o[d].length) delete o[d];
@@ -3409,7 +3496,7 @@ function demoState(id){
 function enterDemo(id){
   if(!demo){ realS=S; }
   demo={id,touched:new Set()}; S=demoState(id); draft=null; clearUndo(); openPicker=null; brush=null;
-  renderDemoBar(); render(); fadeSheet(); window.scrollTo({top:0,behavior:"smooth"});
+  renderDemoBar(); render(); fadeSheet(); intendScroll(); window.scrollTo({top:0,behavior:"smooth"});
 }
 /* 換了一份班表（換範例、進出範例、清除資料）：整張班表很短地淡入，跟換月份的上下滑區分開 */
 function fadeSheet(){ if(typeof canAnim!=="function"||!canAnim()) return; $("sheet").animate([{opacity:0},{opacity:1}],{duration:180,easing:"ease-out"}); }
@@ -3427,6 +3514,7 @@ function demoThemeColor(){
 }
 function renderDemoBar(){
   const bar=$("demoBar"); bar.hidden=!demo; rootEl.classList.toggle("in-demo",!!demo); demoThemeColor();
+  $("demoBtn").setAttribute("aria-pressed",String(!!demo)); $("demoBtn").title=demo?"離開範例，回到你的班表":"看範例：六種工作型態的班表";
   $("backupLock").hidden=!demo; ["backupBtn","restoreBtn","restoreIn","wipeBtn"].forEach(id=>$(id).disabled=!!demo);
   if(!demo) return;
   $("demoPick").innerHTML=DEMO_ORDER.map(k=>`<button class="btn" type="button" data-demo="${k}" aria-pressed="${demo.id===k}">${DEMOS[k].name}</button>`).join("");
@@ -3451,13 +3539,13 @@ const DEMO_EGGS={
   shift:[{t:"春節輪到值班，連假都上早班，之後補休兩天。",f:c=>c.blocks(3,/春節|除夕|小年夜/).length>0},
          {t:"生日 8/23，輪到什麼班就上什麼班，不特別安排。",f:c=>c.m===8},
          {t:"班一直輪，月底不會停，所以連起來的班會接到前後月。"}],
-  part:[{t:"1 月和 6 月的期末考週平日標「考試」、不排班；考完的週六請假放鬆。",f:c=>c.m===1||c.m===6},
+  part:[{t:"1 月和 6 月的期末考週平日標「決戰」（考試）、不排班；考完的週六請假放鬆。",f:c=>c.m===1||c.m===6},
         {t:"7、8 月暑假白天也排班。",f:c=>c.m===7||c.m===8},
-        {t:"情人節、七夕和女朋友的生日，有班就請假去約會。",f:c=>has("part",c,"約會")||has("part",c,"女友生日")},
+        {t:"情人節、七夕和女朋友的生日，有班就請假去約會。",f:c=>has("part",c,"密會")||has("part",c,"女神降臨")},
         {t:"交往紀念日 3/27 不請假，跟同事把班換到隔天。",f:c=>c.m===3},
         {t:"自己的生日 9/21 照常上班，下班再慶祝。",f:c=>c.m===9},
         {t:"女朋友就在這六個範例裡，兩個人的特別日子對照看看。",f:c=>c.m===5},
-        {t:"骨子裡有點中二：隱藏的標籤全都改了名（修行、決戰、密會、女神降臨、締約之日、覺醒日），反正圖片上看不到；會給店長看的部分一切正常。"},
+        {t:"骨子裡有點中二：隱藏的標籤直接取成中二的名字（回復、修行、決戰、密會、女神降臨、締約之日、覺醒日），反正圖片上看不到；會給店長看的部分一切正常。不過有一次把班表複製成文字傳給同事，修行、決戰全部露餡——隱藏只對圖片有效。"},
         {t:"班表名稱是「小安的打工戰記」，但設成不顯示在月曆上，平常都記得把檔名改成「打工班表」才傳給店長。只有某年 11 月感冒請假那次，昏昏沉沉忘了改，店長從此叫他「打工戰士」。他現在還是每次都改，雖然早就沒用了。",f:c=>c.m===11}],
   nurse:[{t:"國定假日上班的話，之後會補一天「國」。",f:c=>has("nurse",c,"國")},
          {t:"每年有一個月會把休假集中起來出國 ✈。",f:c=>c.m===((c.y*7+4)%12)+1},
@@ -3491,6 +3579,8 @@ $("demoExit").onclick=()=>{exitDemo();notify("info","已離開範例，回到你
 const STYLE_ZH={solid:"實心",outline:"空心",hidden:"隱藏"};
 const LOOK_KEYS=[["titleStyle","月份標題",v=>({both:"數字和文字",num:"只有數字",text:"只有文字"})[v||"both"]],["titleTpl","標題文字",v=>`「${v}」`],
   ["showLegend","圖例",v=>v===false?"不顯示":"顯示"],["showStats","統計",v=>v===false?"不顯示":"顯示"],["dowStyle","星期的寫法",v=>({zh:"日 一 二",en:"Sun Mon",en1:"S M T",jp:"日 月 火"})[v||"zh"]],["weekStart","週一當作一週的第一天",v=>v===1?"開":"關"],["showHolidays","國定假日",v=>v===false?"不顯示":"顯示"],["holNames","國定假日的名稱",v=>v===false?"只標日期":"顯示名稱"],["showMakeup","補班日",v=>v===false?"不顯示":"顯示"],["showObs","其他節日",v=>v?"開":"關"],
+  ["layout.multi","一天有好幾個標籤時",v=>({auto:"自動",squeeze:"只擠那幾天",split:"整個月分行"})[v||"auto"]],["layout.timeFmt","時間的寫法",v=>({auto:"自動",one:"一行",two:"兩行"})[v||"auto"]],
+  ["layout.weeks","週數",v=>v==="6"?"固定 6 週":"隨月份"],
   ["layout.rows","每格顯示幾個標籤",v=>v==="auto"?"自動":String(v)],["layout.tag","標籤大小",v=>({s:"小",m:"中",l:"大"})[v]],["layout.date","日期大小",v=>({s:"小",m:"中",l:"大"})[v]],
   ["layout.dispMode","顯示名稱",v=>v==="narrow"?"只在格子太窄時顯示":"一律顯示"],["layout.adj","顯示前後月份的日期",v=>v?"開":"關"],["layout.join","連續的日子連起來",v=>v?"開":"關"],["layout.joinMonth","跨月",v=>v?"連到前後月":"在月底收邊"],
   ["layout.cell","格子樣式",v=>({border:"外框",tint:"淡色底",none:"無"})[v||"border"]],["layout.fill","標籤加高補滿空位",v=>({none:"不加高",some:"加高一點",full:"填滿"})[v]||"加高一點"],["layout.solo","只有一個標籤時的位置",v=>({match:"對齊同一個班",top:"置頂",bottom:"置底"})[v]||"對齊同一個班"],["hiddenMode","隱藏的標籤",v=>({none:"不顯示",edit:"只在編輯時預覽",all:"一律顯示"})[v]],["exportDark","圖片配色",v=>v?"深色":"淺色"]];
@@ -3502,7 +3592,7 @@ function demoApplyPlan(){
   const md=monthData(false), R=S;
   const isPrivate=l=>l.style==="hidden"&&l.name!==dm.def;   // 隱藏、又不是「沒填時的預設」：上課、約會、攀岩……
   const map={};   // 範例的「休」「休假」對到你這個月的第一個休假類標籤
-  dm.labels.forEach(l=>{ map[l.name]=(OFF_WORDS.test(l.name)&&offLabel(md)&&!labOf(md,l.name))?offLabel(md).name:l.name; });
+  dm.labels.forEach(l=>{ map[l.name]=((OFF_WORDS.test(l.name)||(l.name===dm.def&&l.type==="off"))&&offLabel(md)&&!labOf(md,l.name))?offLabel(md).name:l.name;   /* 範例「沒填時的預設」是休假類（例如小安的「回復」）也對到你的休假標籤 */ });
   const pub=dm.labels.filter(l=>!isPrivate(l)), priv=dm.labels.filter(isPrivate);
   const add=pub.filter(l=>!labOf(md,map[l.name])), have=pub.filter(l=>labOf(md,map[l.name])).map(l=>map[l.name]);
   const privAdd=priv.filter(l=>!labOf(md,l.name));
@@ -3567,6 +3657,7 @@ function renderGuide(){
 $("guideDemo").onclick=()=>enterDemo("office");
 $("guideClose").onclick=()=>{S.guideDismissed=true;save();renderGuide();};
 $("openDemo").onclick=()=>enterDemo("office");
+$("demoBtn").onclick=()=>{ if(demo){ exitDemo(); notify("info","已離開範例，回到你自己的班表"); } else enterDemo("office"); };
 
 
 /* ---------- 退場動畫：有進場動畫的地方，關掉時也短短地退場（比進場短） ----------
