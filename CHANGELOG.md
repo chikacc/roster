@@ -6,6 +6,12 @@
 - **次版本**（1.1.0）：新增功能，舊資料完全相容。
 - **修補版本**（1.0.1）：修正問題、調整樣式。
 
+## [1.5.4] - 2026-10-03
+
+### 變更
+
+- 說明頁「阿凱的四個生日」補上阿哲在真正生日那天的一句話。
+
 ## [1.5.3] - 2026-10-03
 
 ### 修正
@@ -230,6 +236,7 @@
 - 第一次使用的引導卡。
 - 可加到主畫面（PWA），開過一次後可離線使用。
 
+[1.5.4]: https://github.com/chikacc/roster/compare/v1.5.3...v1.5.4
 [1.5.3]: https://github.com/chikacc/roster/compare/v1.5.2...v1.5.3
 [1.5.2]: https://github.com/chikacc/roster/compare/v1.5.1...v1.5.2
 [1.5.1]: https://github.com/chikacc/roster/compare/v1.5.0...v1.5.1
