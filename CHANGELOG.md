@@ -6,6 +6,12 @@
 - **次版本**（1.1.0）：新增功能，舊資料完全相容。
 - **修補版本**（1.0.1）：修正問題、調整樣式。
 
+## [1.5.2] - 2026-10-03
+
+### 修正
+
+- 剛塗完格子馬上產生圖片，塗色的閃光和標籤彈出的動畫會被拍進圖片；產生前先讓動畫直接結束。
+
 ## [1.5.1] - 2026-10-02
 
 ### 變更
@@ -217,6 +223,7 @@
 - 第一次使用的引導卡。
 - 可加到主畫面（PWA），開過一次後可離線使用。
 
+[1.5.2]: https://github.com/chikacc/roster/compare/v1.5.1...v1.5.2
 [1.5.1]: https://github.com/chikacc/roster/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/chikacc/roster/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/chikacc/roster/compare/v1.3.1...v1.4.0
