@@ -1,0 +1,44 @@
+# 把 main 的 src/ 建置成 dist/，推到 gh-pages 分支（GitHub Pages 從 gh-pages 的根目錄發佈）
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  # 國定假日更新是用 GITHUB_TOKEN 建立的 commit，不會觸發 push，所以接在它後面再跑一次
+  workflow_run:
+    workflows: ["Update holiday data"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: site
+      - name: Build
+        run: python3 main/build.py
+      - name: Push to gh-pages
+        run: |
+          src_sha=$(git -C main rev-parse --short HEAD)
+          rsync -a --delete --exclude .git main/dist/ site/
+          cd site
+          git add -A
+          if git diff --cached --quiet; then echo "No changes"; exit 0; fi
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "deploy: build from main@${src_sha}"
+          git push origin gh-pages

@@ -1,0 +1,13 @@
+{
+  "name": "roster",
+  "private": true,
+  "description": "班表（roster.chika.cc）的原始碼、建置與測試",
+  "scripts": {
+    "build": "python3 build.py",
+    "test": "bash tests/run.sh"
+  },
+  "devDependencies": {
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@fontsource/noto-sans-tc": "^5.3.0"
+  }
+}
