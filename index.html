@@ -121,7 +121,6 @@ a.btn{text-decoration:none}
   .brush.clear,.brush.stacktog,.brush.histbtn,.brushbar>#exportBtn{min-height:calc(.92rem * 1.5 + 14px);justify-content:center}
   .brushbar{align-items:flex-end}
   #helpBtn .lbl,#demoBtn .lbl{display:none}
-  .demochip .dl{display:none}
 }
 .brushes{display:flex;flex-wrap:wrap;gap:6px;align-items:center;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .brushes .hint{font-size:.8rem;color:var(--muted);margin-right:2px}
@@ -358,7 +357,16 @@ kbd{font-family:var(--f-num);font-size:.8rem;border:1px solid var(--line);border
 @media (min-width:1100px){ :root.in-demo .topbar{padding-top:10px;top:calc(env(safe-area-inset-top,0px) + 8px)} :root.in-demo body::before{height:calc(env(safe-area-inset-top,0px) + 8px)}
   :root.in-demo body{padding-bottom:22px} :root.in-demo .wrap{padding-bottom:0} }
 .demochip{position:sticky;left:0;z-index:2;flex:none;background:var(--accent);color:#fff;border:none;border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;font-weight:800;cursor:pointer}
-@media print{:root.in-demo body::after{display:none}.demochip{display:none}}
+/* 手機：「範例中・離開」改掛在綠框頂端正中間（.demotab），不佔標籤列的寬度 */
+.demotab{display:none}
+@media (max-width:560px){
+  .brushes .demochip{display:none}
+  /* 固定列往下讓出 chip 的高度，捲動後月份那一行不會被壓到 */
+  :root.in-demo .topbar{padding-top:10px;top:calc(env(safe-area-inset-top,0px) + 22px - var(--stickoff,0px))}
+  :root.in-demo body::before{height:calc(env(safe-area-inset-top,0px) + 22px)}
+  :root.in-demo .demotab{display:block;position:fixed;left:50%;top:env(safe-area-inset-top,0px);transform:translateX(-50%);z-index:36;padding:3px 14px;font-size:12.5px;line-height:1.4;box-shadow:0 0 0 3px var(--bg)}
+}
+@media print{:root.in-demo body::after{display:none}.demochip{display:none!important}}
 #backupLock{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .demopick .btn{padding:5px 11px;font-size:.85rem;border-color:var(--accent);background:var(--sheet)}
 .demopick .btn[aria-pressed="true"]{background:var(--btn);color:var(--btn-fg);border-color:var(--btn)}
@@ -849,6 +857,7 @@ a,.linkbtn{white-space:nowrap}
   </div>
   <div class="brushbar"><div class="brushes" id="brushes" role="group" aria-label="標記工具"></div><button class="btn primary" id="exportBtn" type="button" data-icon="image" title="產生圖片"><span class="lbl">產生圖片</span></button></div>
   </div>
+  <button class="demochip demotab" type="button" id="demoTab" title="正在看範例，按一下回到你的班表" aria-label="範例中，按一下離開">範例中・離開 ✕</button>
   <div class="toastbox" id="toastbox" aria-live="polite"></div>
   <div class="helpview" id="helpView" hidden role="dialog" aria-modal="true" aria-labelledby="helpTitle">
     <div class="hvtop"><div class="in"><button class="btn quiet" id="helpClose" type="button" data-icon="x"><span class="lbl">關閉</span></button><b id="helpTitle">使用說明</b><span></span></div></div>
@@ -1187,7 +1196,7 @@ a,.linkbtn{white-space:nowrap}
 <script src="vendor/html2canvas.min.js"></script>
 <script>
 const APP="班表", UNTITLED="未命名班表", FILE_DEFAULT="roster";
-const VERSION="1.5.4";
+const VERSION="1.6.0";
 const ICON={
   tag:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>',
   grid:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10M15 10v10"/></svg>',
@@ -1276,7 +1285,9 @@ const keyOf=(y,m)=>`${y}-${String(m).padStart(2,"0")}`;
 const curKey=()=>{const t=today();return keyOf(t.getFullYear(),t.getMonth()+1);};
 const LAYOUT_DEFAULT=()=>({rows:"auto",tag:"m",date:"m",dow:"m",fill:"some",solo:"match",adj:false,join:false,joinTimed:false,joinMonth:false,cell:"border",multi:"auto",timeFmt:"one",weeks:"auto"});
 const ICS_DEFAULT=()=>({range:"month",pick:{},prefix:false});
-function defaults(){return {v:3,guideDismissed:false,title:"",fileName:"",exportDark:false,exportShape:"wide",exportFit:"fixed",exportRes:"default",exportWidth:2000,showTitle:false,titleAutoDone:false,
+/* 版面（橫式／直式）沒自己選過的話跟著裝置：手機直式（畫面上大一點，傳 LINE、IG 也不裁切），電腦和平板橫式 */
+const autoShape=()=>window.matchMedia("(max-width:760px)").matches?"tall":"wide";
+function defaults(){return {v:3,guideDismissed:false,title:"",fileName:"",exportDark:false,exportShape:autoShape(),shapeSet:false,exportFit:"fixed",exportRes:"default",exportWidth:2000,showTitle:false,titleAutoDone:false,
   showHours:true,showOverflow:true,showHolidays:true,holNames:true,showMakeup:true,showObs:false,hiddenMode:"edit",theme:"system",weekStart:0,stampExport:true,stack:false,
   textFmt:"label",textDefs:false,noShort:{},noLowC:{},showLegend:true,showStats:true,titleStyle:"both",titleTpl:"〔中文月份〕班表 〔年份〕",dowSys:"zh",dowLen:"min",
   layout:LAYOUT_DEFAULT(),ics:ICS_DEFAULT(),colors:{"休假":OFF_DEFAULT,"上班":WORK_DEFAULT},times:{},cross:{},disp:{},sep:{},months:{}};}
@@ -1289,6 +1300,7 @@ function fromData(o){
   if(o.ghostHidden===false&&!o.hiddenMode) st.hiddenMode="none"; delete st.ghostHidden;
   /* 1.5.0：月曆＝圖片，不再有窄格子。「時間的寫法：自動」在圖片裡就是單行；「顯示名稱：僅窄格」拿掉，有設顯示名稱就一律用 */
   if(st.layout.timeFmt!=="two") st.layout.timeFmt="one"; delete st.layout.dispMode;
+  if(!o.shapeSet) st.exportShape=autoShape();
   if(o.dowSys===undefined){ const od=DOW_OLD[o.dowStyle]||DOW_OLD.zh; st.dowSys=od[0]; st.dowLen=od[1]; } delete st.dowStyle;
   ["colors","times","cross","disp","sep"].forEach(k=>{ if(!st[k]||typeof st[k]!=="object") st[k]={}; });
   for(const k in st.months){ const md=st.months[k]; md.days=md.days||{}; (md.labels||[]).forEach(l=>{ if(l.style==="dashed") l.style="outline"; }); for(const d in md.days) if(!Array.isArray(md.days[d])) delete md.days[d]; }
@@ -2306,6 +2318,7 @@ $("grid").addEventListener("click",e=>{
   const again=document.querySelector(`.cell[data-d="${d}"]`); if(again){ again.focus({preventScroll:true});
     fxCell(d,cur,"click"); }
 });
+$("demoTab").onclick=()=>{ exitDemo(); notify("info","已離開範例，回到你自己的班表"); };
 $("brushes").addEventListener("click",e=>{
   if(suppressBrushClick){ suppressBrushClick=false; return; }
   if(e.target.closest("#demoChip")){ exitDemo(); notify("info","已離開範例，回到你自己的班表"); return; }
@@ -3340,7 +3353,7 @@ function syncImgOpts(){
   document.querySelectorAll("[data-xtheme]").forEach(b=>b.setAttribute("aria-pressed",String((b.dataset.xtheme==="dark")===!!S.exportDark)));
 }
 document.querySelectorAll("[data-xfit]").forEach(b=>b.onclick=()=>setImgOpt(()=>{ S.exportFit=b.dataset.xfit; }));
-document.querySelectorAll("[data-xshape]").forEach(b=>b.onclick=()=>setImgOpt(()=>{ S.exportShape=b.dataset.xshape; }));
+document.querySelectorAll("[data-xshape]").forEach(b=>b.onclick=()=>setImgOpt(()=>{ S.exportShape=b.dataset.xshape; S.shapeSet=true; }));
 document.querySelectorAll("[data-xres]").forEach(b=>b.onclick=()=>{ S.exportRes=b.dataset.xres; widthAdj=""; save(); renderExportOpts(); queueExport(0); if(S.exportRes==="custom") $("xWidth").focus(); });
 /* 自訂寬度：打字時不打斷，離開欄位或按 Enter 才套用；超出範圍時自動調整並說明 */
 var widthAdj="";
@@ -3851,7 +3864,7 @@ const DEMOS={
       return o;
     }},
   night:{who:"阿凱",name:"調酒師",look:{exportDark:true,exportShape:"tall",titleStyle:"text",showStats:false,showHolidays:false,showMakeup:false,dowSys:"en",dowLen:"short",titleTpl:"〔英文月份〕 〔年份〕",layout:{date:"l"},noShort:{"18-26":true,"20-29":true,"20-30":true}},title:"Kai's Bar",
-    desc:"在國外學調酒，回來自己開了一間小酒吧，班表就是店的營業日曆，產生的深色直式圖片會發到店的社群給熟客看。公休「OFF」是沒填時的預設、隱藏起來，所以有寫營業時間的日子才有開，空白就是公休。常用 30 小時制：「18-26」就是晚上 6 點到隔天凌晨 2 點、「20-29」是週五、六開到凌晨 5 點，班都記在開始那天，時數也照實際時間算。店走國外的風格，班表整份用英文；星期選「自動」，電腦和圖片寫完整的 Sunday，手機上放不下時自動縮短。",
+    desc:"在國外學調酒，回來自己開了一間小酒吧，班表就是店的營業日曆，產生的深色直式圖片會發到店的社群給熟客看。公休「OFF」是沒填時的預設、隱藏起來，所以有寫營業時間的日子才有開，空白就是公休。常用 30 小時制：「18-26」就是晚上 6 點到隔天凌晨 2 點、「20-29」是週五、六開到凌晨 5 點，班都記在開始那天，時數也照實際時間算。店走國外的風格，班表整份用英文；星期用簡短的 Sun、Mon。",
     colors:{"18-26":"#7c4dcc","20-29":"#d1477a","OFF":"#2b8a6e","20-30":"#e0a020","Birthday":"#d1477a","Burns Night":"#e0a020","April Fools":"#e0a020","Xmas in July":"#e0a020","0% Night":"#e0a020"},
     disp:{"Burns Night":"Burns","April Fools":"Fools","Xmas in July":"Xmas","0% Night":"0%"},
     labels:[{name:"OFF",type:"off",style:"hidden"},{name:"18-26",type:"work",style:"solid"},{name:"20-29",type:"work",style:"solid"}],def:"OFF",
